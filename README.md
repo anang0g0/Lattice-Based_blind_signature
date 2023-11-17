@@ -1,4 +1,4 @@
-# PKP-Based_blind_signature \ for Blockchain in chaumian coin
+# PKP-Based_blind_signature for Blockchain in chaumian coin
 
 # 20231117
 とりあえずこの問題に取り組むことに決めたのはいいんだが、この先余り関心持たないかも。
