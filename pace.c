@@ -679,25 +679,27 @@ void vis()
     return;
 }
 
-void ml2(short a[K][N],short b[N][K],short c[K][K]){
+void ml2(short rr[N][N],short uu[N][N],short tt[K][K]){
   int i,j,k;
 
-  for(i=0;i<K;i++){
-    for(j=0;j<K;j++){
-      c[i][j]=0;
-      for(k=0;k<N;k++){
-	c[i][j]^=gf[mlt(fg[a[i][k]],fg[b[k][j]])];
-	//c[i+K][j]^=gf[mlt(fg[a[i+K][k]],fg[b[k][j+K]])];
-	//c[i][j]^=c[i+K][j+K];
-	  }
+    short v=0,xx=0;
+    for(i=0;i<K;i++){
+      for(j=0;j<K;j++){
+	v=0;
+	xx=0;
+	for(k=0;k<N;k++){
+	  v^=gf[mlt(fg[rr[i][k]],fg[uu[j][k]])];
+	  xx^=gf[mlt(fg[rr[i+K][k]],fg[uu[j+K][k]])];
+	}
+	tt[i][j]=v;
+	//tt[i+K][j]=xx;
+	printf("z%d,",tt[i][j]);
+      }
+      printf("\n");
     }
-  }
-  for(i=0;i<K;i++){
-    for(j=0;j<K;j++)
-      printf("%d ",c[i][j]);
-        printf("\n");
-  }
-  exit(1);
+    printf("\n");
+    //exit(1);
+    
 }
 
 
@@ -814,41 +816,8 @@ label:
       printf("\n");
     }
     printf("\n");
-    //exit(1);
-    //mat_print(t1);
-    //printf("\n");
-    //mat_print(uu);
-    //exit(1);
-    /*
-    for(i=0;i<3;i++){
-      for(j=0;j<6;j++)
-	printf("tt%d ",t1[i][j]);
-      printf("\n");
-    }
-    printf("\n");
 
-    for(j=0;j<3;j++){
-    for(i=0;i<6;i++)
-	printf("ss%d ",t2[i][j]);
-      printf("\n");
-    }
-    printf("\n");
-    //exit(1);
-    */
-    short v=0;
-    for(i=0;i<K;i++){
-      for(j=0;j<K;j++){
-	v=0;
-	for(k=0;k<N;k++)
-	  v^=gf[mlt(fg[rr[i][k]],fg[uu[j][k]])];
-	tt[i][j]=v;
-	printf("z%d,",tt[i][j]);
-      }
-      printf("\n");
-    }
-    printf("\n");
-    exit(1);
-    ml2(g,aa,tt);
+    ml2(rr,uu,tt);
     mat_print(tt);
     //ml2(aa,g,tt);
     //mat_print(tt);
