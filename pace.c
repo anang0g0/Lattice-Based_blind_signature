@@ -692,13 +692,20 @@ void ml2(short rr[N][N],short uu[N][N],short tt[K][K]){
 	  xx^=gf[mlt(fg[rr[i+K][k]],fg[uu[j+K][k]])];
 	}
 	tt[i][j]=v;
-	//tt[i+K][j]=xx;
-	printf("z%d,",tt[i][j]);
+	tt[i+K][j]=xx;
+	//printf("z%d,",tt[i][j]);
       }
+      //printf("\n");
+    }
+    //printf("\n");
+    for(i=0;i<N;i++){
+      for(j=0;j<K;j++)
+	printf("%d ",tt[i][j]);
       printf("\n");
     }
     printf("\n");
-    //exit(1);
+    
+    exit(1);
     
 }
 
