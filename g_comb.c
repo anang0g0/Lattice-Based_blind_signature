@@ -4,11 +4,12 @@
  */
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 // modified. use ./a.out|grep @
-#define N 40
+#define N 1129
 
-unsigned char xx[256][23] = {0};
+unsigned char xx[256][N] = {0};
 
 void swap(unsigned char *pa, unsigned char *pb)
 {
@@ -86,7 +87,7 @@ int cycle(unsigned int rr, size_t r)
 	unsigned char v[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193};
 
 	size_t i;
-	size_t n = 23; // sizeof(v) / sizeof(v[0]);
+	size_t n = 29; // sizeof(v) / sizeof(v[0]);
 	// size_t r=; // = 3;
 	int j = 0, count = 0;
 	// for(r=2;r<16;r++)

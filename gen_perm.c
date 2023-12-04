@@ -6,13 +6,13 @@
 
 #include "g_comb.c"
 
-#define EN 40
-#define MAX 5
+#define EN 1129
+#define MAX 17
 
-unsigned char prm[256][EN] = {0};
-unsigned char t[256][N];
+unsigned short prm[512][EN] = {0};
+unsigned short t[512][N];
 
-#define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(array[0]))
+#define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(short))
 #define SWAP(type, a, b) \
 	{                    \
 		type work = a;   \
@@ -24,7 +24,7 @@ unsigned char t[256][N];
 	Fisher-Yates shuffle による方法
 	配列の要素をランダムシャッフルする
 */
-void random_shuffle(unsigned char *array, size_t size)
+void random_shuffle(unsigned short *array, size_t size)
 {
 	for (size_t i = size; i > 1; --i)
 	{
@@ -115,21 +115,21 @@ void table(unsigned char a[EN])
 void mkcycle()
 {
 
-	unsigned char p[EN], q[EN] = {0};
-	//unsigned char pp[4][MAX] = {0}; //{2, 7, 23, 0};
+	unsigned short p[EN], q[EN] = {0};
 
+	// MAX個のサイクルを持つ置換を４つ出力
 	int cnt = cycle(4, MAX);
 	printf("%d\n", cnt);
 
 	for (int j = 0; j < cnt; j++)
 	{
-		int y = 1;
+		unsigned long long y = 1;
 		for (int i = 0; i < MAX; i++)
 		{
 			printf("%d,", xx[j][i]);
 			y *= xx[j][i];
 		}
-		printf("size[%d]=%d\n", j, y);
+		printf("size[%d]=%llu\n", j, y);
 	}
 	// exit(1);
 
