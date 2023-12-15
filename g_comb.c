@@ -9,9 +9,13 @@
 // modified. use ./a.out|grep @
 #define N 1129
 
-unsigned char xx[256][N] = {0};
+unsigned short xx[256][N] = {0};
 
-void swap(unsigned char *pa, unsigned char *pb)
+typedef struct {
+	unsigned short x[N];
+} vec;
+
+void swap(unsigned short *pa, unsigned short *pb)
 {
 	int tmp;
 
@@ -20,7 +24,7 @@ void swap(unsigned char *pa, unsigned char *pb)
 	*pb = tmp;
 }
 
-void rotate(size_t first, size_t middle, size_t last, unsigned char v[])
+void rotate(size_t first, size_t middle, size_t last, unsigned short v[])
 {
 	size_t middle_org;
 
@@ -46,7 +50,7 @@ void rotate(size_t first, size_t middle, size_t last, unsigned char v[])
 	}
 }
 
-bool next_combination(size_t first, size_t last, size_t r, unsigned char v[])
+bool next_combination(size_t first, size_t last, size_t r, unsigned short v[])
 {
 	size_t subset = first + r;
 	size_t src = subset;
@@ -84,7 +88,7 @@ bool next_combination(size_t first, size_t last, size_t r, unsigned char v[])
 
 int cycle(unsigned int rr, size_t r)
 {
-	unsigned char v[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193};
+	unsigned short v[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193};
 
 	size_t i;
 	size_t n = 29; // sizeof(v) / sizeof(v[0]);
@@ -120,3 +124,71 @@ int cycle(unsigned int rr, size_t r)
 
 	return count;
 }
+
+unsigned long long l=0;
+#define MAX_N N
+int n; // 配列の要素数
+vec arr; // 配列
+int used[MAX_N]; // 選ばれた要素をマークする配列
+int count=0;
+vec vv[5040]={0};
+void permutation(int depth) {
+    if (depth == n) {
+		vv[count]=arr;
+		count++;
+        return;
+    }
+    for (int i = 0; i < n; i++) {
+        if (!used[i]) {
+            arr.x[depth] = i + 1;
+            used[i] = 1;
+            permutation(depth + 1);
+            used[i] = 0;
+        }
+    }
+}
+
+
+void reverse(size_t first, size_t last, unsigned short v[])
+{
+  while (first != last && first != --last) {
+    swap(&v[first], &v[last]);
+    first++;
+  }
+}
+
+bool next_permutation(size_t first, size_t last, unsigned short v[])
+{
+  size_t i, j, k;
+
+  if (first == last) {
+    return false;
+  }
+
+  if (first + 1 == last) {
+    return false;
+  }
+
+  i = last - 1;
+
+  while (true) {
+    j = i--;
+
+    if (v[i] < v[j]) {
+      k = last;
+
+      while (!(v[i] < v[--k])) {
+      }
+
+      swap(&v[i], &v[k]);
+      reverse(j, last, v);
+      return true;
+    }
+
+    if (i == first) {
+      reverse(first, last, v);
+      return false;
+    }
+  }
+}
+
