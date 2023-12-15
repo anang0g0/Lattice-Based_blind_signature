@@ -45,6 +45,41 @@ int equ(unsigned char a[EN], unsigned char b[EN])
 	return 1;
 }
 
+vec lseki(vec a,vec b,int n){
+	vec c={0};
+	//b=ab
+	for(int i=0;i<;i++)
+	c.x[i]=a.x[b.x[i]];
+
+	return c;
+}
+
+vec rseki(vec a,vec b,int n){
+	vec c={0};
+	//b=ba
+	for(int i=0;i<;i++)
+	c.x[i]=b.x[a.x[i]];
+
+	return c;
+}
+
+vec vinv(vec v ,int n){
+	vec x={0};
+	for(int i=0;i<n;i++)
+	x.x[v.x[i]]=i;
+
+	return x;
+}
+
+vec conju(vec a, vec b,int n){
+vec c=vinv(a,n),d={0};
+
+for(int i=0;i<n;i++)
+d.x[i]=a.x[b.x[c.x[i]]];
+
+return d;
+}
+
 void beki(unsigned long long int c)
 {
 	int i, count = 0;
