@@ -131,7 +131,8 @@ int n; // 配列の要素数
 vec arr; // 配列
 int used[MAX_N]; // 選ばれた要素をマークする配列
 int count=0;
-vec vv[5040]={0};
+vec vv[362880]={0};
+vec vx[362880]={0};
 void permutation(int depth) {
     if (depth == n) {
 		vv[count]=arr;

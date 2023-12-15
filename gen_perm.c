@@ -202,15 +202,14 @@ int main()
 	for(int i=0;i<n;i++)
 	v.x[i]=i+1;
   do {
-	vv[cnt]=v;
-    for (int i = 0; i < n; i++) {
-      printf("%d ", v.x[i]);
-    }
-	cnt++;
-    printf("\n");
+	vx[cnt++]=v;
   } while (next_permutation(0, n, v.x));
+	for(int i=0;i<l;i++){
+	for(int j=0;j<n;j++)
+	printf("%d ",vx[i].x[j]);
+	printf("\n");
+	}
 	exit(1);
-
 
 	mkcycle();
 	//nike(1);
