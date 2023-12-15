@@ -183,20 +183,27 @@ void nike(int q)
 int main()
 {
 	unsigned char o[EN];
-	unsigned short n=0;
+
 	srand(clock());
     printf("要素の数を入力してください: ");
     scanf("%d", &n);
-    //permutation(0);
+    permutation(0);
+	l=1;
+	for(int i=1;i<=n;i++)
+	l*=i;
+	for(int i=0;i<l;i++){
+	for(int j=0;j<n;j++)
+	printf("%d ",vv[i].x[j]);
+	printf("\n");
+	}
+	//exit(1);
+	int cnt=0;
 	vec v={0};
 	for(int i=0;i<n;i++)
 	v.x[i]=i+1;
-  	size_t i;
-	int cnt=0;
-
   do {
 	vv[cnt]=v;
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
       printf("%d ", v.x[i]);
     }
 	cnt++;
@@ -204,18 +211,6 @@ int main()
   } while (next_permutation(0, n, v.x));
 	exit(1);
 
-	l=1;
-	for(int i=1;i<=n;i++)
-	l*=i;
-	printf("l=%llu\n",l);
-    // 順列を表示する
-	for(int i=0;i<l;i++){
-	for(int j=0;j<n;j++)
-	printf("%d ",vv[i].x[j]);
-	printf("\n");
-	}
-
-	exit(1);
 
 	mkcycle();
 	//nike(1);
