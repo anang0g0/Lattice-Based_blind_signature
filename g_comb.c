@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 // modified. use ./a.out|grep @
-#define N 1129
+#define N 5
 
 unsigned short xx[256][N] = {0};
 

@@ -48,7 +48,7 @@ int equ(unsigned char a[EN], unsigned char b[EN])
 vec lseki(vec a,vec b,int n){
 	vec c={0};
 	//b=ab
-	for(int i=0;i<;i++)
+	for(int i=0;i<n;i++)
 	c.x[i]=a.x[b.x[i]];
 
 	return c;
@@ -57,7 +57,7 @@ vec lseki(vec a,vec b,int n){
 vec rseki(vec a,vec b,int n){
 	vec c={0};
 	//b=ba
-	for(int i=0;i<;i++)
+	for(int i=0;i<n;i++)
 	c.x[i]=b.x[a.x[i]];
 
 	return c;
@@ -222,6 +222,9 @@ int main()
 	srand(clock());
     printf("要素の数を入力してください: ");
     scanf("%d", &n);
+	//cycle(4,MAX_N);
+	//exit(1);
+
     permutation(0);
 	l=1;
 	for(int i=1;i<=n;i++)
