@@ -10,9 +10,9 @@
 #include <math.h>
 #include <x86intrin.h> // SIMD命令を使用するためのヘッダファイル
 
-#include "global-p.h"
-#include "struct-p.h"
-#include "vmo.c"
+//#include "global-p.h"
+//#include "struct-p.h"
+//#include "vmo.c"
 
 //#define M 49
 //#define K 8
