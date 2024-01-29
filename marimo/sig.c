@@ -390,11 +390,11 @@ int main()
     short cc[K][N] = {0};
     short cd[N][N] = {0};
     short b[N][N] = {0};
-    short a2[N][N] = {0};
-    short a3[N][N] = {0};
+    int a2[64] = {0};
+    int a3[64] = {0};
 
-    memcpy(a2, a, sizeof(a2));
-    memcpy(a3, a, sizeof(a2));
+    //memset(a2, 0, sizeof(a2));
+    //memset(a3, 0, sizeof(a3));
 
     // vis();
     // exit(1);
@@ -407,16 +407,8 @@ int main()
     random_shuffle(P, N);
     random_shuffle(Pa,N);
     short inv_P[N];
-    for (i = 0; i < N; i++)
-    {
-        printf("%d,", P[i]);
-        inv_P[P[i]] = i;
-    }
     short inv_Pa[N]={0};
-    for(i=0;i<N;i++)
-    inv_Pa[Pa[i]]=i;
 
-    printf("\n");
     for(i=0;i<N;i++){
     ra[i]=rand()%4096;
     w[i]=rand()%4096;
@@ -425,17 +417,26 @@ int main()
     if(rand()%2==1)
     v[i]= -1*w[inv_Pa[i]];
     }
-    
+    for (i = 0; i < N; i++)
+    {
+        printf("%d,", P[i]);
+        inv_P[P[i]] = i;
+    }
+    for(i=0;i<N;i++)
+    inv_Pa[Pa[i]]=i;
+    printf("\n");
+
+
     short p1[N]={0},p2[N]={0},p3[N]={0};
     int ca=517;
+    
+    for(j=0;j<32;j++){    
     for(i=0;i<N;i++){
     p1[i]=ra[i]+v[i];
-
     p2[i]=ra[P[i]];
     p3[i]=ra[P[i]]+v[P[i]];
     //z[i]=ca*v[Pa[i]];
     }
-    
     for(i=0;i<N;i++)
     printf("%d %d\n",p1[i],p2[i]);
     long long c0=sum(p1);
@@ -455,7 +456,25 @@ int main()
     for(i=0;i<N;i++)
     vb[i]=z[i]-ca*v[Pa[P[i]]];
     printf("%lld\n",sum(vb));
-
+    a2[j]=sum(va);
+    a3[j]=sum(vb);
+    short tmp1[N]={0};
+    short tmp2[N]={0};
+    for(k=0;k<N;k++){
+        tmp1[k]=Pa[P[inv_Pa[k]]];
+    }
+    for(k=0;k<N;k++){
+        P[k]=tmp1[k];
+    }
+    for(k=0;k<N;k++){
+    inv_P[P[k]]=k;
+    ra[k]^=ra[P[k]];
+    }
+    printf("::\n");
+    }
+    printf("\n");
+    for(i=0;i<32;i++)
+    printf("%d,%d\n",a2[i],a3[i]);
 
     return 0;
 }
