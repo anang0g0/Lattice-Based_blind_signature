@@ -1,7 +1,7 @@
 # PKP-Based_blind_signature for Blockchain in chaumian coin
 
 # 20240129
-## ファイルの説明
+ファイルの説明:
 
 pace.c:PKP-DSSの気標数の拡大体バージョン。というかわざと動かなくしている。
 
