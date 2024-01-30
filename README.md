@@ -5,6 +5,8 @@ cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin
 # 20240130
 PKP-IDSからPKP-DSSの流れ。  
 
+**実装はこの通りじゃありません。独自解釈が入っています。オリジナルはもう少し後で書きます。**
+
 ## PKP-IDS：  
 秘密鍵をsk、公開鍵をpkとする。この時、  
 
