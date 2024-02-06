@@ -10,7 +10,7 @@ PKP-IDSからPKP-DSSの流れ。
 ## PKP-IDS：  
 秘密鍵をsk、公開鍵をpkとする。この時、  
 
-sk=\pi,pk=(v,\alpha=sum(v[\pi(i)]))  
+$sk=\pi,pk=(v,\alpha=sum(v[\pi(i)]))$  
 
 整数ベクトルの隣接する要素の差の総和をとることでハッシュの代わりとしている。  
 ２つの置換$$P,Pa$$を$$P_k=P^{k}[i]$$とし、$$P_k$$をベクトル$v$にかけて$$v[i]^=v[P_k[i]]$$とし、$v$をラウンドごとに更新し、
@@ -19,8 +19,8 @@ sk=\pi,pk=(v,\alpha=sum(v[\pi(i)]))
 rはランダムベクトルとする。
 
 1.  
-c0=sum(r[i]+r[(i+1)%N])  
-c1=sum(r[\phi(i)]^r[\phi(i+1)%N])  
+$c0=sum(r[i]+r[(i+1)%N])$  
+$c1=sum(r[\phi(i)]^r[\phi(i+1)%N])$  
 
 return c0,c1
 
