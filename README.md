@@ -29,20 +29,20 @@ return c0,c1
  c <- F_p  
  
 3.  
-z[i]=r[\phi(i)]+cv[\pi(\phi(i))]  
+$z[i]=r[\phi(i)]+cv[\pi(\phi(i))]$  
 return z
 
 4.  
 if b <- 0  
-return \phi  
+$return \phi$  
 if b <- 1  
-return \pi\phi
+$return \pi\phi$
 
 5.  
 if b=0  
-c_0==sum(z[\phi(i)^{-1}])+\alpha  
+$c_0==sum(z[\phi(i)^{-1}])+\alpha$  
 if b=c  
-c_1==sum(z[i]-cv[\pi\phi(i)])  
+$c_1==sum(z[i]-cv[\pi\phi(i)])$  
 
 PKP-IDSの流れは、こんな感じである。  
 
@@ -51,17 +51,17 @@ PKP-IDSの流れは、こんな感じである。
 
 \phi(1..289)：ランダム置換  
 r(1..289)：ランダムベクトル  
-c_0(1..289)  
-c_1(1..289)  
+$c_0(1..289)$  
+$c_1(1..289)$  
 
-com = H((c_0,c_1)(1..289))
+$com = H((c_0,c_1)(1..289))$
 
 c1,c2,...,c289 <- H(m||com)：ハッシュ関数からｃを作成  
 rsp1=z(1..289)  
 
 b1,b2,..,b289 <- H(m||com||z)：ハッシュ関数からチャレンジビットを生成
 
-rsp2=((b*\pi)\phi(1..289) || c_{1-b}(1,..,289))
+$rsp2=((b*\pi)\phi(1..289) || c_{1-b}(1,..,289))$
 
 return (com,rsp1,rsp2)  
 
@@ -71,7 +71,7 @@ c(i) <- H(m||com)
 b(i) <- H(m||com||rsp1)
 
 rsp1 -> z(i)  
-rsp2 -> (b*\pi\phi(i), c_{1-b}(i))
+$rsp2 -> (b*\pi\phi(i), c_{1-b}(i))$
 
 ... orz（理解不足）
 
