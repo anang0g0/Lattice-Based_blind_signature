@@ -20,7 +20,7 @@ rはランダムベクトルとする。
 
 1.  
 $c0=sum(r[i]+r[(i+1)%N])$  
-$c1=sum(r[\phi(i)]\^ r[\phi(i+1)%N])$  
+$c1=sum(r[\phi(i)]\textasciicircum r[\phi(i+1)%N])$  
 
 return c0,c1
 
