@@ -2,6 +2,9 @@
 
 cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin, Perret
 
+# 20240214
+PKP-DSSの署名サイズは70キロバイト超えるよという話。
+
 # 20240130
 PKP-IDSからPKP-DSSの流れ。  
 
