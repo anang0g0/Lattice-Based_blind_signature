@@ -9,8 +9,8 @@ cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin
 $\pi$を生成する。また、秘密のベクトルXを生成して秘密鍵とする。  
 1-2.自己同型群の位数Mが32以上であることを確認する。  
 1-3.そうでなければ1に戻る。  
-1-4.ベクトルに置換を繰り返しかけて（どうかけるかにもよる）、ラウンドごとに差分の和
-$\Sigma_{i=0}^N(X_{\pi(i)} \oplus X_{(\pi(i+1) ％ N}))$
+1-4.ベクトルに置換を繰り返しかけて（どうかけるかにもよる）、M回のラウンドごとに差分の和
+$\alpha_j=\Sigma_{i=0}^N(X_{\pi(i)} \oplus X_\pi{((i+1) ％ N)})_{j=0..M}$
 をとったものを
 $\alpha$とする。  
 $(\pi,\alpha)$を公開鍵、Xを秘密鍵とする。
