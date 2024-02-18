@@ -3,8 +3,7 @@
 cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin, Perret
 
 # 20240218
-オリジナルバージョン：置換の代わりにベクトルをやり取りする  
-ベクトルPKP（VPKP-IDS）:  
+ベクトルPKP（VPKP-IDS）:置換の代わりにベクトルをやり取りする  
 １．公開鍵の生成  
 1-1.置換群
 $\pi$を生成する。また、秘密のベクトルXを生成して秘密鍵とする。  
