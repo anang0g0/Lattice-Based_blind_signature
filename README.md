@@ -10,8 +10,9 @@ cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin
 1-2.自己同型群の位数が32以上であることを確認する。  
 1-3.そうでなければ1に戻る。  
 1-4.ベクトルに置換を繰り返しかけて、ラウンドごとに差分の和
-$$\Sigma_{i=0}^{32}(X_i \oplus X_{(i+1) ％ N})$$
-をとったものを$\alpha$とする。  
+$\Sigma_{i=0}^{32}(X_i \oplus X_{(i+1) ％ N})$
+をとったものを
+$\alpha$とする。  
 $(\pi,\alpha)$を公開鍵、Xを秘密鍵とする。
 
 ２．認証  
