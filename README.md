@@ -2,8 +2,6 @@
 
 cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin, Perret
 
-# 20240221
-参考文献を追加しました。
 
 # 20240218
 ベクトル置換（あてにならない思い付き）:置換の代わりにベクトルをやり取りする  
