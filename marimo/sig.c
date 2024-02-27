@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "sha3.c"
+
 #define M 128
 #define K 64
 #define N 106
@@ -245,3 +247,4 @@ int main()
 
     return 0;
 }
+
