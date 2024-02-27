@@ -13,7 +13,7 @@
 #define M 16
 #define K 8
 #define N 16
-#define E 4
+#define E 8
 
 // #include "aaa.c"
 
@@ -22,8 +22,6 @@
 
 unsigned short gf[16] = {0, 1, 2, 4, 8, 3, 6, 12, 11, 5, 10, 7, 14, 15, 13, 9};
 unsigned short fg[16] = {0, 1, 2, 5, 3, 9, 6, 11, 4, 15, 10, 8, 7, 14, 12, 13};
-short t1[3][6]={{1,0,0,11,6,7},{0,1,0,15,8,14},{0,0,1,2,14,8}};
-short t2[6][3]={{11,6,7},{15,8,14},{2,14,8},{1,0,0},{0,1,0},{0,0,1}};
 
 /*
  * S-box transformation table
@@ -121,54 +119,18 @@ int oinv(unsigned short b)
     return (N - fg[b]) % (N - 1) + 1;
 }
 
-void T2(short a[N][N],short b[N][N]){
-  int i,j,k;
-
-      for(i=0;i<N;i++){
-      for(j=0;j<N;j++)
-	printf("t%d ",a[i][j]);
-      printf("\n");
-    }
-    for(i=0;i<K;i++){
-      b[i][i+K]=1;
-      b[i+K][i+K]=1;
-      for(j=0;j<K;j++){
-	b[j][i]=a[i][j+K];
-	b[j+K][i]=a[i+K][j+K];
-      }
-    }
-      for(i=0;i<N;i++){
-      for(j=0;j<N;j++)
-	printf("%2d ",b[j][i]);
-      printf("\n");
-    }
-    printf("\n");
-    //exit(1);
-}
-
-void make_mat(short a[N][N]){
-  int i,j,k;
-
-  for(i=0;i<K;i++){
-    a[i][i]=1;
-    a[i+K][i]=1;
-    for(j=K;j<N;j++){
-      a[i][j]=rand()%N;
-      a[i+K][j]=rand()%N;
-    }
-    }
-  for(i=0;i<N;i++){
-    for(j=0;j<N;j++)
-      printf("%d,",a[i][j]);
-    printf("\n");
-  }
-  //exit(1);
-}
-
 // #include "gaus.c"
 
 // 白魔法陣 H
-short aa[K][N] = {
+short aa[16][16] = {
+    {0, 11, 11, 15, 5, 2, 15, 1, 9, 1, 6, 4, 7, 14, 4, 4},
+    {5, 11, 12, 5, 12, 5, 11, 6, 14, 2, 14, 7, 3, 13, 12, 6},
+    {1, 15, 12, 6, 13, 10, 10, 15, 8, 11, 0, 13, 1, 5, 15, 12},
+    {9, 5, 4, 3, 6, 11, 11, 3, 7, 6, 10, 13, 7, 13, 5, 6},
+    {8, 0, 3, 8, 12, 4, 0, 0, 8, 4, 4, 5, 12, 4, 5, 3},
+    {0, 15, 11, 1, 15, 14, 12, 13, 4, 3, 10, 10, 3, 12, 2, 1},
+    {0, 15, 12, 14, 7, 8, 2, 8, 9, 6, 1, 4, 13, 5, 6, 8},
+    {8, 15, 6, 11, 5, 7, 14, 5, 14, 12, 12, 7, 11, 7, 10, 12},
     {0, 11, 11, 15, 5, 2, 15, 1, 9, 1, 6, 4, 7, 14, 4, 4},
     {5, 11, 12, 5, 12, 5, 11, 6, 14, 2, 14, 7, 3, 13, 12, 6},
     {1, 15, 12, 6, 13, 10, 10, 15, 8, 11, 0, 13, 1, 5, 15, 12},
@@ -177,16 +139,7 @@ short aa[K][N] = {
     {0, 15, 11, 1, 15, 14, 12, 13, 4, 3, 10, 10, 3, 12, 2, 1},
     {0, 15, 12, 14, 7, 8, 2, 8, 9, 6, 1, 4, 13, 5, 6, 8},
     {8, 15, 6, 11, 5, 7, 14, 5, 14, 12, 12, 7, 11, 7, 10, 12}};
-    /*
-    {0, 11, 11, 15, 5, 2, 15, 1, 9, 1, 6, 4, 7, 14, 4, 4},
-    {5, 11, 12, 5, 12, 5, 11, 6, 14, 2, 14, 7, 3, 13, 12, 6},
-    {1, 15, 12, 6, 13, 10, 10, 15, 8, 11, 0, 13, 1, 5, 15, 12},
-    {9, 5, 4, 3, 6, 11, 11, 3, 7, 6, 10, 13, 7, 13, 5, 6},
-    {8, 0, 3, 8, 12, 4, 0, 0, 8, 4, 4, 5, 12, 4, 5, 3},
-    {0, 15, 11, 1, 15, 14, 12, 13, 4, 3, 10, 10, 3, 12, 2, 1},
-    {0, 15, 12, 14, 7, 8, 2, 8, 9, 6, 1, 4, 13, 5, 6, 8},
-    {8, 15, 6, 11, 5, 7, 14, 5, 14, 12, 12, 7, 11, 7, 10, 12}};
-    */
+
 short a[N][N] = {
     {2, 2, 5, 3, 1, 3, 3, 11, 15, 8, 5, 10, 6, 4, 9, 2},
     {2, 0, 15, 6, 5, 12, 9, 15, 14, 12, 1, 8, 8, 5, 14, 15},
@@ -226,7 +179,7 @@ short r2[N][N] = {
     {6, 5, 5, 6, 6, 0, 8, 15, 11, 7, 13, 14, 14, 13, 13, 2}};
 
 // 黒魔法陣 G
-short g[8][16] = {
+short g[16][16] = {
     {1, 0, 0, 0, 0, 0, 0, 0, 2, 9, 9, 1, 6, 2, 12, 8},
     {0, 1, 0, 0, 0, 0, 0, 0, 6, 7, 2, 13, 13, 5, 6, 3},
     {0, 0, 1, 0, 0, 0, 0, 0, 4, 13, 15, 1, 11, 10, 8, 10},
@@ -234,8 +187,7 @@ short g[8][16] = {
     {0, 0, 0, 0, 1, 0, 0, 0, 15, 9, 14, 10, 11, 9, 11, 11},
     {0, 0, 0, 0, 0, 1, 0, 0, 10, 7, 9, 9, 1, 9, 13, 10},
     {0, 0, 0, 0, 0, 0, 1, 0, 14, 3, 6, 15, 6, 7, 4, 3},
-    {0, 0, 0, 0, 0, 0, 0, 1, 13, 5, 2, 11, 7, 14, 10, 8}};
-    /*
+    {0, 0, 0, 0, 0, 0, 0, 1, 13, 5, 2, 11, 7, 14, 10, 8},
     {1, 0, 0, 0, 0, 0, 0, 0, 10, 3, 8, 11, 15, 13, 9, 6},
     {0, 1, 0, 0, 0, 0, 0, 0, 12, 5, 13, 13, 13, 13, 12, 9},
     {0, 0, 1, 0, 0, 0, 0, 0, 3, 15, 7, 2, 5, 1, 6, 6},
@@ -244,7 +196,6 @@ short g[8][16] = {
     {0, 0, 0, 0, 0, 1, 0, 0, 13, 14, 9, 4, 8, 11, 4, 11},
     {0, 0, 0, 0, 0, 0, 1, 0, 7, 1, 1, 7, 8, 13, 2, 15},
     {0, 0, 0, 0, 0, 0, 0, 1, 4, 10, 2, 7, 13, 3, 13, 2}};
-    */
 short ggg[16][16] = {
     {1, 0, 0, 0, 0, 0, 0, 0, 3, 13, 8, 2, 6, 7, 13, 1},
     {0, 1, 0, 0, 0, 0, 0, 0, 4, 8, 9, 5, 11, 14, 12, 7},
@@ -309,9 +260,9 @@ void mull(short g[N][N], short h[N][N], short c[N][N])
         {
             for (k = 0; k < N; k++)
                 c[i][j] ^= gf[mlt(fg[g[i][k]], fg[h[j][k]])];
-            //printf("%d,", c[i][j]);
+            printf("%d,", c[i][j]);
         }
-        //printf("\n");
+        printf("\n");
     }
     printf("\n");
     for (i = K; i < N; i++)
@@ -407,42 +358,129 @@ void mat2(short g[N][N], short h[N][N], short c[N][N])
 }
 
 // 行列を表示する関数
-void print_matrix(short A[MATRIX_SIZE][MATRIX_SIZE])
+void print_matrix(double A[MATRIX_SIZE][MATRIX_SIZE])
 {
     for (int i = 0; i < MATRIX_SIZE; i++)
     {
         for (int j = 0; j < MATRIX_SIZE; j++)
         {
-            printf("%d ", A[i][j]);
+            printf("%lf ", A[i][j]);
         }
         printf("\n");
     }
 }
 
 // 行列の掛け算関数
-void matrix_multiply(short A[MATRIX_SIZE][MATRIX_SIZE], short B[MATRIX_SIZE][MATRIX_SIZE], short *C, int start_row, int end_row)
+void matrix_multiply(double A[MATRIX_SIZE][MATRIX_SIZE], double B[MATRIX_SIZE][MATRIX_SIZE], double *C, int start_row, int end_row)
 {
     for (int i = start_row; i < end_row; i++)
     {
         for (int j = 0; j < MATRIX_SIZE; j++)
         {
-            short sum = 0;
+            double sum = 0.0;
             for (int k = 0; k < MATRIX_SIZE; k++)
             {
-	      sum ^= gf[mlt(fg[A[i][k]] , fg[B[k][j]])];
+                sum += A[i][k] * B[k][j];
             }
             C[i * MATRIX_SIZE + j] = sum;
         }
     }
 }
 
+int matmul_simd(double matrixA[MATRIX_SIZE][MATRIX_SIZE], double matrixB[MATRIX_SIZE][MATRIX_SIZE], double *resultMatrix, int start_row, int end_row)
+{
+    // double resultMatrix[MATRIX_SIZE][MATRIX_SIZE] = {0};
 
+    for (int i = start_row; i < end_row; i++)
+    {
+        for (int j = 0; j < MATRIX_SIZE; j++)
+        {
+            __m128d sum = _mm_setzero_pd();
+
+            for (int k = 0; k < MATRIX_SIZE; k++)
+            {
+                __m128d a = _mm_set1_pd(matrixA[i][k]);
+                __m128d b = _mm_loadu_pd(&matrixB[k][j]);
+                sum = _mm_add_pd(sum, _mm_mul_pd(a, b));
+            }
+
+            _mm_storeu_pd(&resultMatrix[i * MATRIX_SIZE + j], sum);
+        }
+    }
+
+    return 0;
+}
+
+void matrix_inverse_simd(double A[MATRIX_SIZE][MATRIX_SIZE], double result[MATRIX_SIZE][MATRIX_SIZE])
+{
+    double pivot[MATRIX_SIZE];
+    for (int i = 0; i < MATRIX_SIZE; i++)
+    {
+        pivot[i] = -1.0;
+    }
+
+    // 1. データ型を__m128dに変更し、SIMDレジスタを使用する
+    __m128d one = _mm_set1_pd(1.0);
+
+    for (int col = 0; col < MATRIX_SIZE; col++)
+    {
+        int pivot_row = -1;
+        double max_value = 0.0;
+
+        for (int row = 0; row < MATRIX_SIZE; row++)
+        {
+            if (pivot[row] != -1.0)
+                continue;
+
+            double val = fabs(A[row][col]);
+            if (val > max_value)
+            {
+                max_value = val;
+                pivot_row = row;
+            }
+        }
+
+        if (pivot_row == -1)
+        {
+            fprintf(stderr, "Matrix is singular.\n");
+            return;
+        }
+
+        pivot[pivot_row] = col;
+
+        // Scale the pivot row
+        double pivot_value = A[pivot_row][col];
+        for (int j = 0; j < MATRIX_SIZE; j++)
+        {
+            A[pivot_row][j] /= pivot_value;
+            result[pivot_row][j] = A[pivot_row][j];
+        }
+
+        // Eliminate non-zero entries below the pivot
+        for (int row = 0; row < MATRIX_SIZE; row++)
+        {
+            if (row == pivot_row)
+                continue;
+
+            // 2. SIMDを使用して計算
+            __m128d scale = _mm_set1_pd(A[row][col]);
+            for (int j = 0; j < MATRIX_SIZE; j += 2)
+            {
+                __m128d row_pivot = _mm_loadu_pd(result[pivot_row] + j);
+                __m128d scaled = _mm_mul_pd(scale, row_pivot);
+                __m128d row_target = _mm_loadu_pd(result[row] + j);
+                row_target = _mm_sub_pd(row_target, scaled);
+                _mm_storeu_pd(result[row] + j, row_target);
+            }
+        }
+    }
+}
 
 // 行列の逆行列を計算する関数
-void inverseMatrix(short A[MATRIX_SIZE][MATRIX_SIZE], short A_inv[MATRIX_SIZE][MATRIX_SIZE], int start_row, int end_row)
+void inverseMatrix(double A[MATRIX_SIZE][MATRIX_SIZE], double A_inv[MATRIX_SIZE][MATRIX_SIZE], int start_row, int end_row)
 {
     int i, j, k;
-    short temp;
+    double temp;
 
     // 単位行列を初期化
     for (i = start_row; i < end_row; i++)
@@ -679,48 +717,18 @@ void vis()
     return;
 }
 
-void ml2(short rr[N][N],short uu[N][N],short tt[K][K]){
-  int i,j,k;
-
-    short v=0,xx=0;
-    for(i=0;i<K;i++){
-      for(j=0;j<K;j++){
-	v=0;
-	xx=0;
-	for(k=0;k<N;k++){
-	  v^=gf[mlt(fg[rr[i][k]],fg[uu[j][k]])];
-	  xx^=gf[mlt(fg[rr[i+K][k]],fg[uu[j+K][k]])];
-	}
-	tt[i][j]=v;
-	tt[i+K][j]=xx;
-	//printf("z%d,",tt[i][j]);
-      }
-      //printf("\n");
-    }
-    //printf("\n");
-    for(i=0;i<N;i++){
-      for(j=0;j<K;j++)
-	printf("%d ",tt[i][j]);
-      printf("\n");
-    }
-    printf("\n");
-    
-    exit(1);
-    
-}
-
 
 int main()
 {
-    short A[MATRIX_SIZE][MATRIX_SIZE];
-    short A_inv[MATRIX_SIZE][MATRIX_SIZE];
-    short C[MATRIX_SIZE][MATRIX_SIZE];
-    short AA[MATRIX_SIZE][MATRIX_SIZE];
+    double A[MATRIX_SIZE][MATRIX_SIZE];
+    double A_inv[MATRIX_SIZE][MATRIX_SIZE];
+    double C[MATRIX_SIZE][MATRIX_SIZE];
+    double AA[MATRIX_SIZE][MATRIX_SIZE];
     MTX r, s, x;
     short rr[N][N] = {0};
     short ss[N][N] = {0};
     short tt[N][N] = {0};
-    //short aa[N][N] = {0};
+    short aa[N][N] = {0};
 
     int i, j, k;
     short c[N][N] = {0};
@@ -752,7 +760,6 @@ int main()
     printf("\n");
     // exit(1);
 
-    /*
     for (i = 0; i < N; i++)
     {
         for (j = 0; j < N; j++)
@@ -764,10 +771,8 @@ int main()
             // count++;
         }
     }
-    */
     int c2 = 0;
 label:
-    /*
     for (i = 0; i < N; i++)
     {
         for (j = 0; j < N; j++)
@@ -798,44 +803,13 @@ label:
         c2 = 0;
     }
     mat_print(r.x);
-    */
     // goto label;
     // exit(1);
     x = r;
     // s=matinv(r,N);
-    make_mat(rr);
-    short uu[N][N]={0};
-    T2(rr,uu);
-    //exit(1);
-    memset(tt,0,sizeof(tt));
-    for(i=0;i<K;i++){
-      for(j=0;j<N;j++){
-	printf("r%d ",rr[i][j]);
-      }
-      printf("\n");
-    }
-    printf("\n");
 
-      for(j=0;j<N;j++){
-    for(i=0;i<K;i++){
-	printf("u%d ",uu[i][j]);
-      }
-      printf("\n");
-    }
-    printf("\n");
-
-    ml2(rr,uu,tt);
-    mat_print(tt);
-    //ml2(aa,g,tt);
-    //mat_print(tt);
-    exit(1);
-    
-    for(i=0;i<N;i++){
-      for(j=0;j<N;j++)
-	tt[i][j]=rr[i][j];
-    }
     inverseMatrix2(rr, ss);
-    
+    /*
         printf("inverse=\n");
         for(i=0;i<N;i++){
             for(j=0;j<N;j++)
@@ -846,18 +820,16 @@ label:
         printf("reguler=\n");
         mat_print(tt);
         memset(rr,0,sizeof(rr));
-        //mat(tt,ss,rr);
-	matrix_multiply(tt,ss,*rr,0,N);
-	print_matrix(rr);
-	//exit(1);
-        //
-        
-     if(reg(rr)==0)
-     goto label;
+        mat(tt,ss,rr);
+        //exit(1);
+        //print_matrix(s.x);
+        */
+    // if(reg(rr)==0)
+    // goto label;
 
     printf("mix=\n");
     mat_print(rr);
-     exit(1);
+    // exit(1);
     printf("GH=\n");
 
     // GH=0であることの確認。
@@ -918,9 +890,7 @@ label:
     printf("mtu=\n");
     mull(f, y, ff);
     // mat(f,yy,ff);
-    printf("ufu=\n");
-    mat_print(y);
-    
+    mat_print(u);
     exit(1);
 
     // 行列 A を初期化
@@ -943,15 +913,15 @@ label:
     int num_processes = 2;
     int rows_per_process = MATRIX_SIZE / num_processes;
 
-    int shmid = shmget(SHM_KEY, sizeof(short) * MATRIX_SIZE * MATRIX_SIZE, IPC_CREAT | 0666);
+    int shmid = shmget(SHM_KEY, sizeof(double) * MATRIX_SIZE * MATRIX_SIZE, IPC_CREAT | 0666);
     if (shmid == -1)
     {
         perror("shmget");
         exit(1);
     }
 
-    short *shared_C = (short *)shmat(shmid, NULL, 0);
-    if (shared_C == (short *)-1)
+    double *shared_C = (double *)shmat(shmid, NULL, 0);
+    if (shared_C == (double *)-1)
     {
         perror("shmat");
         exit(1);
@@ -968,7 +938,7 @@ label:
             int end_row = (i + 1) * rows_per_process;
 
             inverseMatrix(A, A_inv, start_row, end_row);
-            //matmul_simd(AA, A_inv, shared_C, start_row, end_row);
+            matmul_simd(AA, A_inv, shared_C, start_row, end_row);
             // matrix_multiply(AA, A_inv, shared_C, start_row, end_row);
 
             // 結果を表示
@@ -1015,3 +985,4 @@ label:
 
     return 0;
 }
+
