@@ -855,9 +855,10 @@ label:
     short h[N][N] = {0};
     for (i = 0; i < N; i++)
     {
-        for (j = 0; j < N; j++)
+        for (j = 0; j < N; j++){
             if ((j < K && i < K) || (j >= K && i >= K))
                 t[i][inv_P[j]] ^= u[i][j] = (i + j) % N;
+    }
     }
     for (i = 0; i < N; i++)
     {
@@ -889,8 +890,8 @@ label:
     short ff[N][N] = {0};
     printf("mtu=\n");
     mull(f, y, ff);
-    // mat(f,yy,ff);
-    mat_print(u);
+    // mat(f,y,ff);
+    mat_print(ff);
     exit(1);
 
     // 行列 A を初期化
