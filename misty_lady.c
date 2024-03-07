@@ -67,20 +67,6 @@ unsigned char EK[32]={0};
     }
 
 
-void keyinit(unsigned char *inputkey, unsigned int *EK)
-{
-    int i;
-
-    for (i = 0; i < 8; i++)
-        EK[i] = (inputkey[i*2] * 256) + inputkey[i*2+1];
-
-    for (i = 0; i < 8; i++) {
-        EK[i+ 8] = FI(EK[i], EK[(i+1) % 8]);
-        EK[i+16] = EK[i+8] & 0x1ff;
-        EK[i+24] = EK[i+8] >> 9;
-    }
-}
-
 void Key(unsigned char *K){
 int i;
  for (i = 0;i<8;i++)
@@ -148,7 +134,7 @@ int i;
        return FO_OUT;
    }
 
-void enc(unsigned int *expkey, unsigned char *ptext,
+void enc(unsigned char *expkey, unsigned char *ptext,
     unsigned char *ctext)
 {
     unsigned int D0=0; //P%0xffffffff;
@@ -210,7 +196,7 @@ void enc(unsigned int *expkey, unsigned char *ptext,
 }
 
 //long long dec(long long C){
-unsigned long long dec(unsigned int expkey[32], unsigned char *ctext)
+unsigned long long dec(unsigned char expkey[32], unsigned char *ctext)
 {
    //long long D0 = C & 0xffffffff;
    //long long D1 = C >> 32;
@@ -261,44 +247,28 @@ return P;
 }
 
 void main(void){
-unsigned char Key[]={0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
-unsigned char Plaintext[16]={0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10};
-unsigned char Ciphertext[16]={0x8b,0x1d,0xa5,0xf5,0x6a,0xb3,0xd0,0x7c,0x04,0xb6,0x82,0x40,0xb1,0x3b,0xe9,0x5d};
-unsigned char C[16]={0};
-long long P=0;
+unsigned char K[]={0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
+unsigned long long P;
 
-    static unsigned char ciphertext1[8];
-    static unsigned char ciphertext2[8];
-    static unsigned char decryptedplaintext1[8];
-    static unsigned char decryptedplaintext2[8];
-    unsigned int expandedkey[32];
+    static unsigned char ciphertext[8];
+    static unsigned char decryptedplaintext[8];
 
-    static unsigned char plaintext1[8] = {
+    static unsigned char plaintext[8] = {
         0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef
     };
 
-    static unsigned char plaintext2[8] = {
-        0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10
-    };
 
-    static unsigned char key[16] = {
-        0
-        //0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
-        //0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff
-    };
-
-    
-    keyinit(key, expandedkey);
+    Key(K);
     printf("old plaintext1 : ");
-    for (int i = 0; i < 8; i++) printf("%02x", plaintext1[i]);
+    for (int i = 0; i < 8; i++) printf("%02x", plaintext[i]);
     printf("\n");
 
-    enc(expandedkey, plaintext1, ciphertext1);
+    enc(EK, plaintext, ciphertext);
     printf("ciphertext1    : ");
-    for (int i = 0; i < 8; i++) printf("%02x", ciphertext1[i]);
+    for (int i = 0; i < 8; i++) printf("%02x", ciphertext[i]);
     printf("\n");
 
-    P=dec(expandedkey, ciphertext1);
+    P=dec(EK, ciphertext);
     printf("new plaintext1 : ");
     printf("%016llx\n",P);
 
