@@ -148,7 +148,7 @@ void ha(__uint128_t a,__uint128_t b){
         a <<= 1;
         if (hbs)
             a ^= 0xf3; // 0000 0000 1111 0011
-　       b >>= 1;
+        b >>= 1;
     }
 
 }
@@ -482,13 +482,15 @@ void enc(uint8_t *m, __uint8_t *k)
     unsigned char n=0;
 
     round();
-    for (i = 0; i < 32; i++){
-        n = (m[i] + k[r[i]]) % 256;
-        m[i]=s_box[((n % 16) + (n >> 4) * 16)];
+    for (i = 0; i < 4; i++)
+	{
+		for(int j=0;j<8;j++)
+        m[(i*8+j)%32] = (m[(i*8+j)] + k[r[(i*8+j)%32]]) % 256;
+        //m[i]=s_box[((n % 16) + (n >> 4) * 16)];
         //m[i]=n;
     }
-    shift_rows(m);
-    mix_columns(m);
+    //shift_rows(m);
+    //mix_columns(m);
 }
 
 void dec(uint8_t *c, uint8_t *k)
@@ -497,13 +499,15 @@ void dec(uint8_t *c, uint8_t *k)
     unsigned char n=0;
 
 
-    inv_mix_columns(c);
-    inv_shift_rows(c);
-    for (i = 0; i < 32; i++){
+    //inv_mix_columns(c);
+    //inv_shift_rows(c);
+    for (i = 0; i < 4; i++){
+		for(int j=0;j<8;j++){
         n=c[i];
-        c[i]=inv_s_box[((n % 16) + (n >> 4) * 16)];
-        c[i] = (256 + c[i] - k[r[i]]) % 256;
+        //c[i]=inv_s_box[((n % 16) + (n >> 4) * 16)];
+        c[(i*8+j)%32] = (256 + c[(i*8+j)%32] - k[r[(i*8+j)%32]]) % 256;
         //c[i]=n;
+		}
     }
     reverse();
 }
@@ -604,7 +608,7 @@ int main()
     for (i = 0; i < 32; i++)
     {
         m[i] = i;
-        k[i] = 0;//rand() % 128;
+        k[i] = rand() % 256;
         p[i]=i;
         r[i]=i;
     }
@@ -615,6 +619,13 @@ int main()
 
 	aes_key_expansion(k, w);
 
+
+    random_shuffle(p,SIZE_OF_ARRAY(p));
+    random_shuffle(r,SIZE_OF_ARRAY(r));
+    for(i=0;i<32;i++){
+        inv_p[p[i]]=i;
+    }
+
 	printf("Plaintext message:\n");
 	for (i = 0; i < 4; i++) {
 		printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
@@ -622,17 +633,19 @@ int main()
 
 	printf("\n");
 
-	aes_cipher(m /* in */, out /* out */, w /* expanded key */);
+	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
+	enc(m,w);
 
 	printf("Ciphered message:\n");
 	for (i = 0; i < 4; i++) {
+		printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
 		printf("%02x %02x %02x %02x ", out[4*i+0], out[4*i+1], out[4*i+2], out[4*i+3]);
 	}
 
 	printf("\n");
 
-	aes_inv_cipher(out, m, w);
-
+	//aes_inv_cipher(out, m, w);
+	dec(m,w);
 	printf("Original message (after inv cipher):\n");
 	for (i = 0; i < 4; i++) {
 		printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
@@ -648,11 +661,6 @@ int main()
     //exit(1);
 
 
-    random_shuffle(p,SIZE_OF_ARRAY(p));
-    random_shuffle(r,SIZE_OF_ARRAY(r));
-    for(i=0;i<32;i++){
-        inv_p[p[i]]=i;
-    }
 
     printf("key=\n");
     for (i = 0; i < 32; i++)
