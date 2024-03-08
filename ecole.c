@@ -1,5 +1,5 @@
 /* generate GF(2^n) using irreducible polynomial */
-//ゼフ対数表を作るためのプログラム。正規基底を生成します。
+// ゼフ対数表を作るためのプログラム。正規基底を生成します。
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,30 +8,78 @@
 #define O 256
 
 /* generate Galois Field over GF(2^?) */
-static const unsigned long long int normal[15] = {
+static const unsigned long long int normal[14] = {
     0b1011,
-    //"11001", /* GF(16) */
+  //0b11001", /* GF(16) */
     0b10011,
     0b110111,
     0b1100001,
     0b11000001,
-    //0b110101001,
-    0b100011101, //sage
-    //0b100011011,
-                 //0b100011011",
+ // 0b110101001,
+    0b100011101, // sage
+ // 0b100011011,
+ // 0b100011011",
     0b1100110001,
-    //0b11000010011,
-    0b10001101111, //sage1024
+ // 0b11000010011,
+    0b10001101111, // sage1024
     0b110000001101,
-    0b1000011101011, //sage 4096
-    //0b1100101000001, /* 4096 */
-    //0b11011000000001, /* 8192 */
+    0b1000011101011, // sage 4096
+ // 0b1100101000001, /* 4096 */
+ // 0b11011000000001, /* 8192 */
     0b10000000011011, /* Classic McEliece */
     0b110000100010001,
     0b1100000000000001,
     0b11010000000010001};
 
 unsigned int gf[O], fg[O];
+
+uint32_t pd(uint32_t a, uint32_t b)
+{
+  uint32_t c = 0;
+
+  //printf("%b,%b\n", a, b);
+  // while(b>0)
+  if (b >= a)
+    return a;
+
+  c = b;
+  while (1)
+  {
+    while (a > b)
+      b = (b << 1);
+    b >>= 1;
+    a ^= b;
+     printf("%b %b\n", a,b);
+    if (c > a)
+      return a;
+    b = c;
+    if(b==a)
+     break;
+  }
+  return a;
+}
+
+uint32_t seki(uint32_t a, uint32_t b)
+{
+  uint32_t c = 0;
+
+  while (a != 0)
+  {
+    if ((a & 1) == 1)
+      c ^= b;
+
+    b <<= 1;
+    a >>= 1;
+  }
+
+  return c;
+}
+
+uint32_t pmod(uint32_t a, uint32_t b, uint32_t c)
+{
+
+  return pd(seki(a, b), c);
+}
 
 /*
  * Multiplication in GF(2^8)
@@ -43,26 +91,26 @@ unsigned int gf[O], fg[O];
  *       the aes.h header file to find the macro definition.
  *
  */
-uint8_t gmult(uint8_t a, uint8_t b)
+uint16_t gmult(uint16_t a, uint16_t b)
 {
 
-    uint8_t p = 0, i = 0, hbs = 0;
+  uint16_t p = 0, i = 0, hbs = 0;
 
-    for (i = 0; i < 8; i++)
+  for (i = 0; i < 8; i++)
+  {
+    if (b & 1)
     {
-        if (b & 1)
-        {
-            p ^= a;
-        }
-
-        hbs = a & 0x80;
-        a <<= 1;
-        if (hbs)
-            a ^= 0x1b; // 0000 0001 0001 1011
-        b >>= 1;
+      p ^= a;
     }
 
-    return (uint8_t)p;
+    hbs = a & 0x80;
+    a <<= 1;
+    if (hbs)
+      a ^= 0x1b; // 0000 0001 0001 1011
+    b >>= 1;
+  }
+
+  return (uint8_t)p;
 }
 
 void makefg(int n)
@@ -100,7 +148,7 @@ void mkgf(int n)
   unsigned int pol, N, M, L;
 
   for (i = 0; i < 13; i++)
-    pol = normal[i]; //strtoul(normal[i],(char **)NULL,2);
+    pol = normal[i]; // strtoul(normal[i],(char **)NULL,2);
 
   /* define pol */
   switch (n)
@@ -167,25 +215,25 @@ void mkgf(int n)
     break;
   }
   L = 1;
-  while (pol > L) //原始多項式の最大次数を計算する。
+  while (pol > L) // 原始多項式の最大次数を計算する。
   {
     L = (L << 1);
     count++;
   }
   L = (L >> 1);
-  N = pol ^ L; //原始多項式の最大次数を消した多項式の残り。
+  N = pol ^ L; // 原始多項式の最大次数を消した多項式の残り。
 
   gf[0] = 0;
   bit = 1;
   for (i = 1; i < L; i++)
   {
-    if (bit > L - 1) //もしbitが最大次数に達したら
+    if (bit > L - 1) // もしbitが最大次数に達したら
     {
-      bit = bit - L; //bitから最大次数の項 x^n を消す。
-      bit = bit ^ N; //最大次数の項以下の原始多項式を bit に xorする。
+      bit = bit - L; // bitから最大次数の項 x^n を消す。
+      bit = bit ^ N; // 最大次数の項以下の原始多項式を bit に xorする。
     }
-    gf[i] = bit; //最初は何もしないでx^iを入れていく。
-    bit = (bit << 1); //原始多項式の次数を1上げる。
+    gf[i] = bit;      // 最初は何もしないでx^iを入れていく。
+    bit = (bit << 1); // 原始多項式の次数を1上げる。
   }
   printf("static const unsigned short gf[%d]={", O);
   for (i = 0; i < L; i++)
@@ -203,34 +251,45 @@ void mkgf(int n)
   printf("};\n");
 }
 
-void make(){
-int i,j;
+void make()
+{
+  uint32_t i, j;
 
-printf("static const unsigned short fg[256]={\n");
-gf[0]=0;
-printf("  0,");
-  for(i=1;i<O;i++){
-    for(j=0;j<O;j++){
-  if(gmult(i,j)==1){
-  gf[i]=j;
-  printf("%3d,",i);
-  }
+  printf("static const unsigned short fg[256]={\n");
+  gf[0] = 0;
+  printf("  0,");
+  for (i = 1; i < O; i++)
+  {
+    for (j = 0; j < O; j++)
+    {
+      //
+      //if(gmult(i,j)==1)
+      if (pmod(i, j,normal[5]) == 1)
+      {
+        gf[i] = j;
+        printf("%3d,", i);
+      }
     }
   }
   printf("};\n");
-  for(i=0;i<O;i++){
-  printf("%3d,",gf[i]);
+  for (i = 0; i < O; i++)
+  {
+    printf("%3d,", gf[i]);
   }
   printf("\n");
-
 }
 
 int main()
 {
   int i, j, k;
 
-  make();
+  //printf("%b %b %b\n", pmod(0b10011001, 0b11010001,normal[10]), gmult(0b10011001, 0b11010001), pd(0b1010111, 0b101));
+  //printf("%b\n", seki(0b10011001, 0b11010001));
+  printf("%b %b\n", pd(0b10000, 0b1011), pmod(0b100000000, 0b10, normal[5]));
   exit(1);
+
+  make();
+  //exit(1);
 
   mkgf(O);
   makefg(O);
