@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define O 8192
+#define E 13
 
 /* generate Galois Field over GF(2^?) */
 static const unsigned long long int normal[17] = {
@@ -36,98 +37,23 @@ static const unsigned long long int normal[17] = {
 
 unsigned int gf[O], fg[O];
 
-uint16_t pd2(uint16_t a, uint16_t b)
-{
-  uint16_t c = 0;
-  int i;
-  unsigned int MSB=8;
-  //printf("%b,%b\n", a, b);
-  // while(b>0)
-  if(b==0)
-  exit(1);
-  if(a==0)
-  return 0;
-  if(a==1 && a>=b)
-  return 1;
-  if(a<b)
-  return a;
-  if(a==b)
-  return 0;
-  uint16_t d=a;
-  c = b;
-  while(a!=0)
-  { 
-    int count=0,cnt=0;
-    while(b>0){
-      count++;
-      b>>=1;
-    }
-    while(a>0){
-      cnt++;
-      a>>=1;
-    }
-    a=d;
-    b=c;
-    if(a<c)
-    return a;
-    if(cnt<count){
-    printf("baka\n");
-    exit(1);
-    }
-    while (cnt > count){
-      b = (b << 1);
-      //printf("e %b %b\n",a,b);
-      if(cnt==count)
-      break;
-      count++;
-    }
-    if(cnt==count)
-    a^=b;
-    //b >>= 1;
-    //printf("d %b %b %b\n", a,b,c);
-    printf("c %b %b %b\n", a,b,c);
-     
-    if(a<c)
-    return a;
-    if(a==b)
-    return 0;
-
-    b = c;
-    if(a<b)
-    break;
-  }
-  exit(1);
-  return a;
-}
-
 uint16_t pd(uint16_t a, uint16_t b)
 {
-  uint16_t c = 0;
-  int i;
-  unsigned int MSB=8;
-  //printf("%b,%b\n", a, b);
-  // while(b>0)
-  if(a==0)
-  return 0;
+  uint16_t c = 0,hbs=0;
 
-  c = b;
-  while(a>0)
+  while (a != 0)
   {
-    while (a > b)
-      b = (b << 1);
-    b >>= 1;
-    a ^= b;
-     printf("c %b %b\n", a,b);
-     //exit(1);
-
-    if (c > a)
-      return a;
-    if(b==a)
-     exit(1);
-
-    b = c;
+    //printf("b %b %b %b\n",a,b,c);
+    if ((a & 1) == 1)
+      c ^= b;
+    hbs= b&(1<<(E-1));
+    b <<= 1;
+    if(hbs)
+    b ^=normal[E]^(1<<E);
+    a >>= 1;
   }
-  return a;
+
+  return c&0x1fff;
 }
 
 uint16_t seki(uint16_t a, uint16_t b)
@@ -139,10 +65,9 @@ uint16_t seki(uint16_t a, uint16_t b)
     //printf("b %b %b %b\n",a,b,c);
     if ((a & 1) == 1)
       c ^= b;
-    hbs= b&(1<<12);
+    
     b <<= 1;
-    if(hbs)
-    b ^=0x1b; //0x1b;
+    
     a >>= 1;
   }
 
@@ -337,8 +262,9 @@ void make()
     for (j = 0; j < O; j++)
     {
     //
-    //if (pmod(i, j,normal[8]) == 1)
-    if(seki(i,j)==1)
+    //
+    //if(seki(i,j)==1)
+    if (pd(i, j) == 1)
       {
         gf[i] = j;
         printf("%3d %3d,\n", i,j);

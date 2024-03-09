@@ -72,7 +72,7 @@ static const uint8_t inv_s_box[256] = {
 	0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61, // e
 	0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d};// f
 
-void seki(register __uint128_t a, register __uint128_t b)
+int seki(register __uint128_t a, register __uint128_t b)
 {
 
   //register __m256i_u c;
@@ -429,7 +429,7 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
-void round(){
+void rounder(){
     for(int i=0;i<32;i++)
     q[i]=p[r[inv_p[i]]];
     for(int i=0;i<32;i++)
@@ -481,7 +481,7 @@ void enc(uint8_t *m, __uint8_t *k)
     int i;
     unsigned char n=0;
 
-    round();
+    rounder();
     for (i = 0; i < 4; i++)
 	{
 		for(int j=0;j<8;j++)
@@ -614,6 +614,7 @@ int main()
     }
 	uint8_t *w; // expanded key
     uint8_t out[32];
+
 
 	w = aes_init(32);
 
