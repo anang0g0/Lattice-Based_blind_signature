@@ -20,8 +20,8 @@ static const unsigned long long int normal[17] = {
     0b1100001,
     0b11000001,
  // 0b110101001,
-    0b100011101, // sage
- // 0b100011011,
+  //  0b100011101, // sage
+    0b100011011, // aes
  // 0b100011011",
     0b1100110001,
  // 0b11000010011,
@@ -29,8 +29,8 @@ static const unsigned long long int normal[17] = {
     0b110000001101,
     0b1000011101011, // sage 4096
  // 0b1100101000001, /* 4096 */
-  // 0b11011000000001, /* 8192 */
-    0b10000000011011, /* Classic McEliece */
+    0b11011000000001, /* 8192 */
+  //  0b10000000011011, /* Classic McEliece */
     0b110000100010001,
     0b1100000000000001,
     0b11010000000010001};
@@ -39,21 +39,21 @@ unsigned int gf[O], fg[O];
 
 uint16_t pd(uint16_t a, uint16_t b)
 {
-  uint16_t c = 0,hbs=0;
+  uint16_t c = 0,hbs=0,ll=(1<<(E-1)), l=(1<<E);
 
   while (a != 0)
   {
     //printf("b %b %b %b\n",a,b,c);
     if ((a & 1) == 1)
       c ^= b;
-    hbs= b&(1<<(E-1));
+    hbs= b&(ll);
     b <<= 1;
     if(hbs)
-    b ^=normal[E]^(1<<E);
+    b ^=normal[E]^l;
     a >>= 1;
   }
 
-  return c&0x1fff;
+  return c&0x1fff; //mask
 }
 
 uint16_t seki(uint16_t a, uint16_t b)
