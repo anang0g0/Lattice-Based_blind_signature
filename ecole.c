@@ -37,9 +37,59 @@ static const unsigned long long int normal[17] = {
 
 unsigned int gf[O], fg[O];
 
-uint16_t pd(uint16_t a, uint16_t b)
+uint32_t pdiv(uint32_t a, uint32_t b)
 {
-  uint16_t c = 0,hbs=0,ll=(1<<(E-1)), l=(1<<E);
+  uint32_t c = 0,d=a;
+
+  //printf("%b,%b\n", a, b);
+  // while(b>0)
+  if(a==b){
+    printf("eq\n");
+    //exit(1);
+  return 0;
+  }
+  c = b;
+  while (1)
+  {
+    int m=a,n=b,count=0,cnt=0;
+    while(m>0){
+      cnt++;
+      m=m>>1;
+    }
+    while(n>0){
+      count++;
+      n=n>>1;
+    }
+    while (cnt > count){
+      b = (b << 1);
+      count++;
+    }
+    if(cnt==count && a%2==1){
+    //printf("545646 %b %b %b\n",a,b,b^a);
+    a^=b;
+    //return (a)&0x7;
+    }
+    //b >>= 1;
+    //printf("@@ %b %b\n",a,b);
+    if(a%2==0)
+    a ^= c;
+    // printf("cc%b %b\n", a,b);
+    if (c > a)
+      break;
+    //if(b==a)
+    //return 0;
+
+    b = c;
+    //a=d;
+    // break;
+  }
+  //printf("bb %b\n",a^c);
+  return a&0x1fff;
+}
+
+uint32_t pd(uint32_t a, uint32_t b,uint32_t d)
+{
+  uint32_t c = 0,hbs=0,ll=(1<<(E-1)), l=d^(1<<E);
 
   while (a != 0)
   {
@@ -49,16 +99,16 @@ uint16_t pd(uint16_t a, uint16_t b)
     hbs= b&(ll);
     b <<= 1;
     if(hbs)
-    b ^=normal[E]^l;
+    b ^=l;
     a >>= 1;
   }
 
   return c&0x1fff; //mask
 }
 
-uint16_t seki(uint16_t a, uint16_t b)
+uint64_t seki(uint64_t a, uint64_t b)
 {
-  uint16_t c = 0,hbs=0;
+  uint64_t c = 0,hbs=0;
 
   while (a != 0)
   {
@@ -71,13 +121,14 @@ uint16_t seki(uint16_t a, uint16_t b)
     a >>= 1;
   }
 
-  return c&0x1fff;
+  return c;
 }
 
 uint16_t pmod(uint16_t a, uint16_t b, uint16_t c)
 {
 
-  return pd(seki(a, b), c);
+  //printf("vv %b %b %b\n",seki(a,b),c,pdiv(seki(a,b),c));
+  return pdiv(seki(a, b), c);
 }
 
 /*
@@ -264,14 +315,17 @@ void make()
     //
     //
     //if(seki(i,j)==1)
-    if (pd(i, j) == 1)
+    //if (pd(i, j) == 1)
+      //printf("iiiii %b %b %b\n",i,j,pmod(i,j,normal[13]));
+      if(pd(i,j,normal[E])==1)
       {
         gf[i] = j;
-        printf("%3d %3d,\n", i,j);
+        printf("---%3d %3d %b %b %b,\n", i,j,pmod(i,j,normal[E]),pd(i,j,normal[E]),seki(i,j));
       }
     }
   }
   printf("};\n");
+  //exit(1);
   for (i = 0; i < O; i++)
   {
     printf("%3d,", gf[i]);
@@ -283,9 +337,9 @@ int main()
 {
   int i, j, k;
 
-  //printf("%b %b %b\n", pmod(0b10011001, 0b11010001,normal[10]), gmult(0b10011001, 0b11010001), pd(0b1010111, 0b101));
-  printf("%b\n", seki(0b10011001, 0b11010001));
-  printf("%b %b\n", gmult(0b10000000, 0b10), pmod(0b100000000,0b10,0b100011011));
+  printf("%b %b %b %b\n",4,7, pmod(0b100, 0b111,normal[3]), pd(0b100, 0b111,normal[3]));
+  //printf("%b %b %b\n", pdiv(0b101111,0b101),pmod(0b101111,0b101,normal[13]),pd(0b101111,2,normal[13]));
+  //printf("%b %b\n", pd(6912, 0b10, normal[13])); //pmod(0b100000000,0b10,0b100011011));
   //exit(1);
 
   make();
