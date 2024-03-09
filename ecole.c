@@ -5,10 +5,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define O 256
+#define O 8192
 
 /* generate Galois Field over GF(2^?) */
-static const unsigned long long int normal[14] = {
+static const unsigned long long int normal[17] = {
+  0b0,
+  0b0,
+  0b0,
     0b1011,
   //0b11001", /* GF(16) */
     0b10011,
@@ -25,7 +28,7 @@ static const unsigned long long int normal[14] = {
     0b110000001101,
     0b1000011101011, // sage 4096
  // 0b1100101000001, /* 4096 */
- // 0b11011000000001, /* 8192 */
+  // 0b11011000000001, /* 8192 */
     0b10000000011011, /* Classic McEliece */
     0b110000100010001,
     0b1100000000000001,
@@ -33,49 +36,120 @@ static const unsigned long long int normal[14] = {
 
 unsigned int gf[O], fg[O];
 
-uint32_t pd(uint32_t a, uint32_t b)
+uint16_t pd2(uint16_t a, uint16_t b)
 {
-  uint32_t c = 0;
-
+  uint16_t c = 0;
+  int i;
+  unsigned int MSB=8;
   //printf("%b,%b\n", a, b);
   // while(b>0)
-  if (b >= a)
+  if(b==0)
+  exit(1);
+  if(a==0)
+  return 0;
+  if(a==1 && a>=b)
+  return 1;
+  if(a<b)
+  return a;
+  if(a==b)
+  return 0;
+  uint16_t d=a;
+  c = b;
+  while(a!=0)
+  { 
+    int count=0,cnt=0;
+    while(b>0){
+      count++;
+      b>>=1;
+    }
+    while(a>0){
+      cnt++;
+      a>>=1;
+    }
+    a=d;
+    b=c;
+    if(a<c)
     return a;
+    if(cnt<count){
+    printf("baka\n");
+    exit(1);
+    }
+    while (cnt > count){
+      b = (b << 1);
+      //printf("e %b %b\n",a,b);
+      if(cnt==count)
+      break;
+      count++;
+    }
+    if(cnt==count)
+    a^=b;
+    //b >>= 1;
+    //printf("d %b %b %b\n", a,b,c);
+    printf("c %b %b %b\n", a,b,c);
+     
+    if(a<c)
+    return a;
+    if(a==b)
+    return 0;
+
+    b = c;
+    if(a<b)
+    break;
+  }
+  exit(1);
+  return a;
+}
+
+uint16_t pd(uint16_t a, uint16_t b)
+{
+  uint16_t c = 0;
+  int i;
+  unsigned int MSB=8;
+  //printf("%b,%b\n", a, b);
+  // while(b>0)
+  if(a==0)
+  return 0;
 
   c = b;
-  while (1)
+  while(a>0)
   {
     while (a > b)
       b = (b << 1);
     b >>= 1;
     a ^= b;
-     printf("%b %b\n", a,b);
+     printf("c %b %b\n", a,b);
+     //exit(1);
+
     if (c > a)
       return a;
-    b = c;
     if(b==a)
-     break;
+     exit(1);
+
+    b = c;
   }
   return a;
 }
 
-uint32_t seki(uint32_t a, uint32_t b)
+uint16_t seki(uint16_t a, uint16_t b)
 {
-  uint32_t c = 0;
+  uint16_t c = 0,hbs=0;
 
   while (a != 0)
   {
+    //printf("b %b %b %b\n",a,b,c);
     if ((a & 1) == 1)
       c ^= b;
-
+    hbs= b&(1<<12);
     b <<= 1;
+    if(hbs)
+    b ^=0x1b; //0x1b;
     a >>= 1;
   }
 
-  return c;
+  return c&0x1fff;
 }
 
-uint32_t pmod(uint32_t a, uint32_t b, uint32_t c)
+uint16_t pmod(uint16_t a, uint16_t b, uint16_t c)
 {
 
   return pd(seki(a, b), c);
@@ -91,19 +165,19 @@ uint32_t pmod(uint32_t a, uint32_t b, uint32_t c)
  *       the aes.h header file to find the macro definition.
  *
  */
-uint16_t gmult(uint16_t a, uint16_t b)
+uint32_t gmult(uint32_t a, uint32_t b)
 {
 
-  uint16_t p = 0, i = 0, hbs = 0;
+  uint32_t p = 0, i = 0, hbs = 0;
 
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 9; i++)
   {
     if (b & 1)
     {
       p ^= a;
     }
 
-    hbs = a & 0x80;
+    hbs = a & (0x80);
     a <<= 1;
     if (hbs)
       a ^= 0x1b; // 0000 0001 0001 1011
@@ -155,62 +229,62 @@ void mkgf(int n)
   {
 
   case 8:
-    pol = normal[0];
-    printf("%d\n", n);
-    break;
-
-  case 16:
-    pol = normal[1];
-    printf("%d\n", n);
-    break;
-
-  case 32:
-    pol = normal[2];
-    printf("%d\n", n);
-    break;
-
-  case 64:
     pol = normal[3];
     printf("%d\n", n);
     break;
 
-  case 128:
+  case 16:
     pol = normal[4];
     printf("%d\n", n);
     break;
 
-  case 256:
+  case 32:
     pol = normal[5];
     printf("%d\n", n);
     break;
 
-  case 512:
+  case 64:
     pol = normal[6];
     printf("%d\n", n);
     break;
 
-  case 1024:
+  case 128:
     pol = normal[7];
     printf("%d\n", n);
     break;
 
-  case 2048:
+  case 256:
     pol = normal[8];
     printf("%d\n", n);
     break;
 
-  case 4096:
+  case 512:
     pol = normal[9];
     printf("%d\n", n);
     break;
 
-  case 8192:
+  case 1024:
     pol = normal[10];
     printf("%d\n", n);
     break;
 
-  default: /* 16384 */
+  case 2048:
     pol = normal[11];
+    printf("%d\n", n);
+    break;
+
+  case 4096:
+    pol = normal[12];
+    printf("%d\n", n);
+    break;
+
+  case 8192:
+    pol = normal[13];
+    printf("%d\n", n);
+    break;
+
+  default: /* 16384 */
+    pol = normal[14];
     printf("%d\n", n);
     break;
   }
@@ -262,12 +336,12 @@ void make()
   {
     for (j = 0; j < O; j++)
     {
-      //
-      //if(gmult(i,j)==1)
-      if (pmod(i, j,normal[5]) == 1)
+    //
+    //if (pmod(i, j,normal[8]) == 1)
+    if(seki(i,j)==1)
       {
         gf[i] = j;
-        printf("%3d,", i);
+        printf("%3d %3d,\n", i,j);
       }
     }
   }
@@ -284,12 +358,12 @@ int main()
   int i, j, k;
 
   //printf("%b %b %b\n", pmod(0b10011001, 0b11010001,normal[10]), gmult(0b10011001, 0b11010001), pd(0b1010111, 0b101));
-  //printf("%b\n", seki(0b10011001, 0b11010001));
-  printf("%b %b\n", pd(0b10000, 0b1011), pmod(0b100000000, 0b10, normal[5]));
-  exit(1);
+  printf("%b\n", seki(0b10011001, 0b11010001));
+  printf("%b %b\n", gmult(0b10000000, 0b10), pmod(0b100000000,0b10,0b100011011));
+  //exit(1);
 
   make();
-  //exit(1);
+  exit(1);
 
   mkgf(O);
   makefg(O);
