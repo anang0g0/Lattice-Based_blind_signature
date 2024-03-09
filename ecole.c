@@ -112,7 +112,6 @@ uint32_t gmult(uint32_t a, uint32_t b)
   return (uint8_t)p;
 }
 
-
 void makefg(int n)
 {
   int i, j;
@@ -288,4 +287,12 @@ int main()
   printf("%b\n", seki(0b10011001, 0b11010001));
   printf("%b %b\n", gmult(0b10000000, 0b10), pmod(0b100000000,0b10,0b100011011));
   //exit(1);
+
+  make();
+  exit(1);
+
+  mkgf(O);
+  makefg(O);
+
+  return 0;
 }
