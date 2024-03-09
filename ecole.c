@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define O 8192
-#define E 13
+#define O 4096
+#define E 12
 
 /* generate Galois Field over GF(2^?) */
 static const unsigned long long int normal[17] = {
@@ -65,25 +65,19 @@ uint32_t pdiv(uint32_t a, uint32_t b)
       count++;
     }
     if(cnt==count && a%2==1){
-    //printf("545646 %b %b %b\n",a,b,b^a);
-    a^=b;
-    //return (a)&0x7;
+    //printf("545646 %b %b %b\n",a,b,(b^a));
+    a^=(b);
+    if(a<c)
+    return a;
     }
-    //b >>= 1;
-    //printf("@@ %b %b\n",a,b);
-    if(a%2==0)
+    if(a%2==0 && cnt==count)
     a ^= c;
-    // printf("cc%b %b\n", a,b);
     if (c > a)
       break;
-    //if(b==a)
-    //return 0;
 
     b = c;
-    //a=d;
-    // break;
   }
-  //printf("bb %b\n",a^c);
+
   return a&0x1fff;
 }
 
@@ -317,7 +311,7 @@ void make()
     //if(seki(i,j)==1)
     //if (pd(i, j) == 1)
       //printf("iiiii %b %b %b\n",i,j,pmod(i,j,normal[13]));
-      if(pd(i,j,normal[E])==1)
+      if(pmod(i,j,normal[E])==1)
       {
         gf[i] = j;
         printf("---%3d %3d %b %b %b,\n", i,j,pmod(i,j,normal[E]),pd(i,j,normal[E]),seki(i,j));
@@ -337,7 +331,8 @@ int main()
 {
   int i, j, k;
 
-  printf("%b %b %b %b\n",4,7, pmod(0b100, 0b111,normal[3]), pd(0b100, 0b111,normal[3]));
+  printf("%b %b %b %b %b\n",4,5, pmod(4, 0b101,normal[3]), pd(0b100, 0b101,normal[3]),(seki(4,5)^(normal[3]<<1)));
+    printf("%b %b %b %b\n",4,7, pmod(4, 0b111,normal[3]), pd(0b100, 0b111,normal[3]));
   //printf("%b %b %b\n", pdiv(0b101111,0b101),pmod(0b101111,0b101,normal[13]),pd(0b101111,2,normal[13]));
   //printf("%b %b\n", pd(6912, 0b10, normal[13])); //pmod(0b100000000,0b10,0b100011011));
   //exit(1);
