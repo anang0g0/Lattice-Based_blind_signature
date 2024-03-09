@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define O 256
+#define O 8192
 
 /* generate Galois Field over GF(2^?) */
 static const unsigned long long int normal[15] = {
@@ -43,10 +43,10 @@ unsigned int gf[O], fg[O];
  *       the aes.h header file to find the macro definition.
  *
  */
-uint8_t gmult(uint8_t a, uint8_t b)
+uint16_t gmult(uint16_t a, uint16_t b)
 {
 
-    uint8_t p = 0, i = 0, hbs = 0;
+    uint16_t p = 0, i = 0, hbs = 0;
 
     for (i = 0; i < 8; i++)
     {
@@ -55,15 +55,17 @@ uint8_t gmult(uint8_t a, uint8_t b)
             p ^= a;
         }
 
-        hbs = a & 0x80;
+        hbs = a & 0x800;
         a <<= 1;
         if (hbs)
-            a ^= 0x1b; // 0000 0001 0001 1011
+            a ^= 0b0000000011011, /* Classic McEliece */
+             //0x1b; // 0000 0001 0001 1011
         b >>= 1;
     }
 
-    return (uint8_t)p;
+    return (uint16_t)p;
 }
+
 
 void makefg(int n)
 {
@@ -218,11 +220,12 @@ printf("  0,");
     }
   }
   printf("};\n");
+  
   for(i=0;i<O;i++){
   printf("%3d,",gf[i]);
   }
   printf("\n");
-
+  exit(1);
 }
 
 int main()
@@ -230,7 +233,7 @@ int main()
   int i, j, k;
 
   make();
-  exit(1);
+  //exit(1);
 
   mkgf(O);
   makefg(O);
