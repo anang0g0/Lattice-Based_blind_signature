@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define O 4096
-#define E 12
+#define O 256
+#define E 8
 
 /* generate Galois Field over GF(2^?) */
 static const unsigned long long int normal[17] = {
@@ -326,6 +326,7 @@ void make()
   }
   printf("\n");
 }
+
 
 int main()
 {
