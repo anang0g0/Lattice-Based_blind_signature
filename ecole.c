@@ -68,7 +68,7 @@ uint32_t pdiv(uint32_t a, uint32_t b)
     //printf("545646 %b %b %b\n",a,b,(b^a));
     a^=(b);
     if(a<c)
-    return a;
+    return a&0xff;
     }
     if(a%2==0 && cnt==count)
     a ^= c;
@@ -78,7 +78,7 @@ uint32_t pdiv(uint32_t a, uint32_t b)
     b = c;
   }
 
-  return a&0x1fff;
+  return a&0xff;
 }
 
 uint32_t pd(uint32_t a, uint32_t b,uint32_t d)
@@ -97,7 +97,7 @@ uint32_t pd(uint32_t a, uint32_t b,uint32_t d)
     a >>= 1;
   }
 
-  return c&0x1fff; //mask
+  return c&0xff; //mask
 }
 
 uint64_t seki(uint64_t a, uint64_t b)
@@ -118,7 +118,7 @@ uint64_t seki(uint64_t a, uint64_t b)
   return c;
 }
 
-uint16_t pmod(uint16_t a, uint16_t b, uint16_t c)
+uint32_t pmod(uint32_t a, uint32_t b, uint32_t c)
 {
 
   //printf("vv %b %b %b\n",seki(a,b),c,pdiv(seki(a,b),c));
@@ -327,6 +327,34 @@ void make()
   printf("\n");
 }
 
+void t_box()
+{
+  uint32_t i, j;
+
+
+  gf[0] = 0;
+  for (i = 1; i < O; i++)
+  {
+    gf[i]=gmult(gmult(i,i),i); //pmod(pmod(i,i,normal[E]),i,normal[E]);
+  }
+
+  //exit(1);
+  printf("static const unsigned short gf[256]={\n");
+  for (i = 0; i < O; i++)
+  {
+    //fg[gf[i]]=i;
+    printf("%3d,", gf[i]);
+  }
+  printf("};\n");
+  printf("\n");
+  printf("static const unsigned short fg[256]={\n");
+  for (i = 0; i < O; i++)
+  {
+    //printf("%3d,", fg[i]);
+  }
+  printf("};\n");
+  printf("\n");
+}
 
 int main()
 {
@@ -339,6 +367,8 @@ int main()
   //exit(1);
 
   make();
+  //t_box();
+  printf("%d %d\n",gmult(seki(9,9),9),gmult(seki(34,34),34));
   exit(1);
 
   mkgf(O);
