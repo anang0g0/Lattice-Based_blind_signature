@@ -656,7 +656,7 @@ int main()
 	for(i=0;i<256;i++)
 	printf("%u,",inv_t[i]);
 	printf("\n");
-	//exit(1);
+	exit(1);
 
 	w = aes_init(32);
 
