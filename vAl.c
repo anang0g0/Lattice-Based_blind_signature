@@ -451,6 +451,8 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
+
+
 void rounder(){
     for(int i=0;i<32;i++)
     q[i]=p[r[inv_p[i]]];
@@ -678,8 +680,8 @@ int main()
 
 	printf("\n");
 
-	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
-	enc(m,w);
+	aes_cipher(m /* in */, out /* out */, w /* expanded key */);
+	//enc(m,w);
 
 	printf("Ciphered message:\n");
 	for (i = 0; i < 4; i++) {
@@ -689,7 +691,7 @@ int main()
 
 	printf("\n");
 
-	//aes_inv_cipher(out, m, w);
+	aes_inv_cipher(out, m, w);
 	dec(m,w);
 	printf("Original message (after inv cipher):\n");
 	for (i = 0; i < 4; i++) {
@@ -703,7 +705,7 @@ int main()
     for(int i=0;i<16;i++)
     printf("%d,",m[i]);
     printf("\n");
-    //exit(1);
+    exit(1);
 
 
 
