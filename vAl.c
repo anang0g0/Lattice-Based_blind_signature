@@ -505,8 +505,10 @@ int mlt(int x, int y)
 void enc(uint8_t *m, __uint8_t *k)
 {
     int i;
-    unsigned char n=0;
-
+    unsigned char n=0,ff[32]={0};
+	
+	for(i=0;i<32;i++)
+	ff[i]=i;
     rounder();
 		//for(int l=0;l<32;l++)
 		//
@@ -524,18 +526,19 @@ void enc(uint8_t *m, __uint8_t *k)
 
         //m[i]=n;
     }
-    //shift_rows(m);
-    //mix_columns(m);
+    shift_rows(m);
+    mix_columns(m);
 }
 
 void dec(uint8_t *c, uint8_t *k)
 {
     int i;
-    unsigned char n=0;
+    unsigned char n=0,ff[32]={0};
 
-
-    //inv_mix_columns(c);
-    //inv_shift_rows(c);
+	for(i=0;i<32;i++)
+	ff[i]=i;
+    inv_mix_columns(c);
+    inv_shift_rows(c);
     for (i = 0; i < 4; i++){
 		unsigned char tmp[32]={0};
 		
@@ -548,7 +551,7 @@ void dec(uint8_t *c, uint8_t *k)
 		//for(int l=0;l<8;l++)
 		//k[i*8+l]=t[k[i*8+l]];	
     }
-			for(int l=0;l<32;l++)
+		for(int l=0;l<32;l++)
 		k[l]=inv_t[k[l]];
 
 		//for(int l=0;l<32;l++)
@@ -761,7 +764,7 @@ int main()
 	printf("\n");
 
 	//aes_inv_cipher(out, m, w);
-	for(i=0;i<6;i++)
+	for(i=0;i<16;i++)
 	dec(m,w);
 	printf("Original message (after inv cipher):\n");
 	for (i = 0; i < 4; i++) {
@@ -772,7 +775,7 @@ int main()
 
 	free(w);
 
-	//exit(1);
+	exit(1);
 
     for(int i=0;i<16;i++)
     printf("%d,",m[i]);
