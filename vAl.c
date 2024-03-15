@@ -360,25 +360,6 @@ void inv_shift_rows(uint8_t *state) {
 }
 
 
-void add(uint8_t *m,uint8_t *k){
-    int i,n;
-    for (i = 0; i < 32; i++){
-        n = (m[i] + k[r[i]]) % 256;
-        //m[i]=s_box[((n % 16) + (n >> 4) * 16)];
-        m[i]=n;
-    }
-}
-
-void sub(uint8_t *c,uint8_t *k){
-    int i,n;
-    for(i=0;i<32;i++){
-        //n=c[i];
-        //c[i]=inv_s_box[((n % 16) + (n >> 4) * 16)];
-        c[i] = (256 + c[i] - k[r[i]]) % 256;
-    }
-
-}
-
 
 /*
  * Function used in the Key Expansion routine that takes a four-byte 
@@ -506,6 +487,26 @@ int mlt(int x, int y)
 }
 
 
+void add(uint8_t *m,uint8_t *k){
+    int i,n;
+    for (i = 0; i < 32; i++){
+        n = (m[i] + k[r[i]]) % 256;
+        //m[i]=s_box[((n % 16) + (n >> 4) * 16)];
+        m[i]=n;
+    }
+}
+
+void sub(uint8_t *c,uint8_t *k){
+    int i,n;
+    for(i=0;i<32;i++){
+        //n=c[i];
+        //c[i]=inv_s_box[((n % 16) + (n >> 4) * 16)];
+        c[i] = (256 + c[i] - k[r[i]]) % 256;
+    }
+
+}
+
+
 void enc(uint8_t *m, __uint8_t *k)
 {
     int i;
@@ -514,19 +515,17 @@ void enc(uint8_t *m, __uint8_t *k)
     rounder();
 
 		for(int l=0;l<32;l++)
-		ff[l]^=t[k[r[l]]];
-		//memcpy(k,ff,32);
+		ff[l]=t[k[r[l]]];
+		memcpy(k,ff,32);
     for (i = 0; i < 4; i++)
 	{
 		unsigned char tmp[32]={0};
 
 		for(int j=0;j<8;j++){
-		//m[(i*8+j)%32]
 		n= (m[(i*8+j)%32] + (ff[r[(i*8+j)%32]])) % 256;
 		m[(i*8+j)]=t[((n % 16) + (n >> 4) * 16)];
 		}
 
-        //m[i]=n;
     }
     //shift_rows(m);
     //mix_columns(m);
@@ -551,9 +550,9 @@ void dec(uint8_t *c, uint8_t *k)
     }
 
 		for(int l=0;l<32;l++)
-		ff[l]^=inv_t[k[inv_r[l]]];
+		ff[l]=inv_t[k[inv_r[l]]];
+		memcpy(k,ff,32);
 
-		//memcpy(k,ff,32);
 	    reverse();
 }
 
@@ -702,16 +701,17 @@ int main()
 {
     unsigned short i;
     unsigned char m[128];
-    unsigned char k[32];
+    unsigned char k[32],ss[32];
 	unsigned tt[256],inv_tt[256];
     //unsigned char p[32],inv_p[32];
 	unsigned char s[32],inv_s[32];
     for (i = 0; i < 32; i++)
     {
-        m[i] = i;
+        m[i] = i+1;
         k[i] = rand() % 256;
         p[i]=i;
         r[i]=i;
+		ss[i]=k[i];
 		
     }
 	uint8_t *w; // expanded key
@@ -751,7 +751,7 @@ int main()
 
 	printf("\n");
 	for(i=0;i<32;i++)
-	kkk[i]=i+1;
+	kkk[i]=255;
 	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
 	for(i=0;i<16;i++)
 	enc(kkk,w);
@@ -770,8 +770,9 @@ int main()
 	//dec(kkk,w);
 	memset(kkk,0,32);
 	for(i=0;i<32;i++)
-	kkk[i]=i+1;
+	kkk[i]=255;
 	memcpy(r,s,32);
+	memcpy(w,ss,32);
 	for(i=0;i<16;i++)
 	enc(kkk,w);
 	
