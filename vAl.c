@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <immintrin.h>
 
-unsigned char p[32], q[32],r[32],inv_p[32],gf[256],fg[256];
+unsigned char p[32], q[32],r[32],inv_r[32],inv_p[32],gf[256],fg[256],kkk[32]={0};
 
 static const unsigned short t[256]={
   0,  1,128,255,154, 19,101,163, 53,173, 67, 62, 80, 93,170,115,197, 30,235, 87,214,243, 50, 65,149,  6, 79, 32, 70, 54,165, 24, 97,208,153,253,139,216, 56,143, 34,103, 63, 52,104,210,205,  8,244,241, 45,228,140, 29,171,199, 96, 64, 94, 41,135, 46,180,123,102,167, 15, 83,174, 35,126, 95,109,183, 99,191, 31,148, 91,231,176,225, 75,158,178,217, 69,155,138, 17, 20,144, 13,177,108,254,146, 51, 36,179,113,246, 74,202,192, 23,  2,120,198, 42,122, 10,230,185, 77, 61,212,219, 71, 86, 55,207,234,166,223,106,201,249,203, 39,156,  4,193,187, 14, 49,112,  7, 48,168,127,131, 84,118, 60,141, 68,152,125, 44, 40, 37, 25,226,116,121, 98,100,209, 16,233,107,252,161,186,196,  3,147,242,134,227,211,251,110,181, 85,237, 92, 88, 47,238,213, 66,142,218, 76,105,162,188,189,229,136, 89, 90,232,124,157,204,114,133,190,164,137,159, 58,111,160,200,215,195,117,239, 27, 43, 82,221,250, 38,220, 21, 73,172,119,182, 81,236,  5,132,151, 18,169, 33, 57,240,248,150,224, 12,184,194,222, 26, 22,247, 11,129, 28,130,206,175,145, 78, 59,  9, 72,245,};
@@ -453,11 +453,15 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
+
+
 void rounder(){
     for(int i=0;i<32;i++)
     q[i]=p[r[inv_p[i]]];
     for(int i=0;i<32;i++)
     r[i]=q[i];
+	for(int i=0;i<32;i++)
+	inv_r[r[i]]=i;
 }
 
 void reverse(){
@@ -465,6 +469,8 @@ void reverse(){
     q[i]=inv_p[r[p[i]]];
     for(int i=0;i<32;i++)
     r[i]=q[i];
+	for(int i=0;i<32;i++)
+	inv_r[r[i]]=i;
 }
 
 #define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(short))
@@ -503,16 +509,23 @@ int mlt(int x, int y)
 void enc(uint8_t *m, __uint8_t *k)
 {
     int i;
-    unsigned char n=0;
-
+    unsigned char n=0,ff[32]={0};
+	
     rounder();
+
+		for(int l=0;l<32;l++)
+		ff[l]^=t[k[r[l]]];
+		//memcpy(k,ff,32);
     for (i = 0; i < 4; i++)
 	{
+		unsigned char tmp[32]={0};
+
 		for(int j=0;j<8;j++){
-    	//m[(i*8+j)%32] 
-		n= (m[(i*8+j)] + k[r[(i*8+j)%32]]) % 256;
+		//m[(i*8+j)%32]
+		n= (m[(i*8+j)%32] + (ff[r[(i*8+j)%32]])) % 256;
 		m[(i*8+j)]=t[((n % 16) + (n >> 4) * 16)];
 		}
+
         //m[i]=n;
     }
     //shift_rows(m);
@@ -522,20 +535,26 @@ void enc(uint8_t *m, __uint8_t *k)
 void dec(uint8_t *c, uint8_t *k)
 {
     int i;
-    unsigned char n=0;
-
+    unsigned char n=0,ff[32]={0};
 
     //inv_mix_columns(c);
     //inv_shift_rows(c);
     for (i = 0; i < 4; i++){
+		unsigned char tmp[32]={0};
+		
 		for(int j=0;j<8;j++){
-        n=c[i*8+j];
-        c[i*8+j]=inv_t[((n % 16) + (n >> 4) * 16)];
-        c[(i*8+j)%32] = (256 + c[(i*8+j)%32] - k[r[(i*8+j)%32]]) % 256;
-        //c[i]=n;
+		n=c[i*8+j];
+	    c[i*8+j]=inv_t[((n % 16) + (n >> 4) * 16)];
+		c[(i*8+j)%32] = (256 + c[(i*8+j)%32] - (ff[r[(i*8+j)%32]])) % 256;
+		//
 		}
     }
-    reverse();
+
+		for(int l=0;l<32;l++)
+		ff[l]^=inv_t[k[inv_r[l]]];
+
+		//memcpy(k,ff,32);
+	    reverse();
 }
 
 
@@ -686,13 +705,14 @@ int main()
     unsigned char k[32];
 	unsigned tt[256],inv_tt[256];
     //unsigned char p[32],inv_p[32];
-
+	unsigned char s[32],inv_s[32];
     for (i = 0; i < 32; i++)
     {
         m[i] = i;
         k[i] = rand() % 256;
         p[i]=i;
         r[i]=i;
+		
     }
 	uint8_t *w; // expanded key
     uint8_t out[32];
@@ -718,8 +738,10 @@ int main()
 
     random_shuffle(p,SIZE_OF_ARRAY(p));
     random_shuffle(r,SIZE_OF_ARRAY(r));
+	memcpy(s,r,32);
     for(i=0;i<32;i++){
         inv_p[p[i]]=i;
+		inv_r[r[i]]=i;
     }
 
 	printf("Plaintext message:\n");
@@ -728,10 +750,13 @@ int main()
 	}
 
 	printf("\n");
-
-	aes_cipher(m /* in */, out /* out */, w /* expanded key */);
-	//enc(m,w);
-
+	for(i=0;i<32;i++)
+	kkk[i]=i+1;
+	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
+	for(i=0;i<16;i++)
+	enc(kkk,w);
+	for(i=0;i<32;i++)
+	m[i]^=kkk[i];
 	printf("Ciphered message:\n");
 	for (i = 0; i < 4; i++) {
 		//printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
@@ -740,8 +765,19 @@ int main()
 
 	printf("\n");
 
-	aes_inv_cipher(out, m, w);
-	//dec(m,w);
+	//aes_inv_cipher(out, m, w);
+	//for(i=0;i<16;i++)
+	//dec(kkk,w);
+	memset(kkk,0,32);
+	for(i=0;i<32;i++)
+	kkk[i]=i+1;
+	memcpy(r,s,32);
+	for(i=0;i<16;i++)
+	enc(kkk,w);
+	
+	for(i=0;i<32;i++)
+	m[i]^=kkk[i];
+	printf("\n");
 	printf("Original message (after inv cipher):\n");
 	for (i = 0; i < 4; i++) {
 		printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
@@ -751,35 +787,4 @@ int main()
 
 	free(w);
 
-	exit(1);
-
-    for(int i=0;i<16;i++)
-    printf("%d,",m[i]);
-    printf("\n");
-    //exit(1);
-
-
-
-    printf("key=\n");
-    for (i = 0; i < 32; i++)
-        printf("%d,", k[i]);
-    printf("\n");
-
-    printf("cipher=\n");
-    for(i=0;i<14;i++){
-    enc(m, k);
-    //mix_columns(m);
-    }
-    for (i = 0; i < 32; i++)
-        printf("%d,", m[i]);
-    printf("\n");
-
-    printf("plain=\n");
-    for(i=0;i<14;i++){
-    //inv_mix_columns(m);
-    dec(m, k);
-    }
-    for (i = 0; i < 32; i++)
-        printf("%d,", inv_t[t[m[i]]]);
-    printf("\n");
 }
