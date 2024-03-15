@@ -514,15 +514,15 @@ void enc(uint8_t *m, __uint8_t *k)
 	
     rounder();
 
-		for(int l=0;l<32;l++)
-		ff[l]=t[k[r[l]]];
-		memcpy(k,ff,32);
+		//for(int l=0;l<32;l++)
+		//ff[l]=t[k[r[l]]];
+		//memcpy(k,ff,32);
     for (i = 0; i < 4; i++)
 	{
 		unsigned char tmp[32]={0};
 
 		for(int j=0;j<8;j++){
-		n= (m[(i*8+j)%32] + (ff[r[(i*8+j)%32]])) % 256;
+		n= (m[(i*8+j)%32] + (k[r[(i*8+j)%32]])) % 256;
 		m[(i*8+j)]=t[((n % 16) + (n >> 4) * 16)];
 		}
 
@@ -544,14 +544,14 @@ void dec(uint8_t *c, uint8_t *k)
 		for(int j=0;j<8;j++){
 		n=c[i*8+j];
 	    c[i*8+j]=inv_t[((n % 16) + (n >> 4) * 16)];
-		c[(i*8+j)%32] = (256 + c[(i*8+j)%32] - (ff[r[(i*8+j)%32]])) % 256;
+		c[(i*8+j)%32] = (256 + c[(i*8+j)%32] - (k[r[(i*8+j)%32]])) % 256;
 		//
 		}
     }
 
-		for(int l=0;l<32;l++)
-		ff[l]=inv_t[k[inv_r[l]]];
-		memcpy(k,ff,32);
+		//for(int l=0;l<32;l++)
+		//ff[l]=inv_t[k[inv_r[l]]];
+		//memcpy(k,ff,32);
 
 	    reverse();
 }
@@ -754,9 +754,9 @@ int main()
 	kkk[i]=255;
 	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
 	for(i=0;i<16;i++)
-	enc(kkk,w);
-	for(i=0;i<32;i++)
-	m[i]^=kkk[i];
+	enc(m,w);
+	//for(i=0;i<32;i++)
+	//m[i]^=kkk[i];
 	printf("Ciphered message:\n");
 	for (i = 0; i < 4; i++) {
 		//printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
@@ -766,8 +766,9 @@ int main()
 	printf("\n");
 
 	//aes_inv_cipher(out, m, w);
-	//for(i=0;i<16;i++)
-	//dec(kkk,w);
+	for(i=0;i<16;i++)
+	dec(m,w);
+	/*
 	memset(kkk,0,32);
 	for(i=0;i<32;i++)
 	kkk[i]=255;
@@ -775,10 +776,10 @@ int main()
 	memcpy(w,ss,32);
 	for(i=0;i<16;i++)
 	enc(kkk,w);
-	
 	for(i=0;i<32;i++)
 	m[i]^=kkk[i];
 	printf("\n");
+	*/
 	printf("Original message (after inv cipher):\n");
 	for (i = 0; i < 4; i++) {
 		printf("%02x %02x %02x %02x ", m[4*i+0], m[4*i+1], m[4*i+2], m[4*i+3]);
