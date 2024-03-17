@@ -296,7 +296,7 @@ int mlt(int x, int y)
 void add(uint8_t *m,uint8_t *k){
     int i,n;
     for (i = 0; i < 32; i++){
-        n = (m[i] + k[i]) % 256;
+        n = (m[i] + k[r[i]]) % 256;
 		//m[i]=s_box[((n % 16) + (n >> 4) * 16)];
         m[i]=n;
     }
@@ -305,9 +305,9 @@ void add(uint8_t *m,uint8_t *k){
 void sub(uint8_t *c,uint8_t *k){
     int i,n;
     for(i=0;i<32;i++){
-        //c[i]=inv_s_box[c[i]];
+        c[i]=c[i];
         //c[i]=inv_s_box[((n % 16) + (n >> 4) * 16)];
-        c[i] = (256+ c[i] - k[i]) % 256;
+        c[i] = (256+ c[i] - k[r[i]]) % 256;
     }
 
 }
@@ -594,15 +594,15 @@ int main()
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
 	printf("%d ",w[l]);
-	w[l]^=w[r[l]];
+	//w[l]^=w[r[l]];
 	}
 	printf("\n");
 	rounder();
 	//perm(m,r);
 	//enc(m,w);
 	add(m,w);
-	for(i=0;i<32;i++)
-	m[i]=s_box[m[i]];
+	for(int l=0;l<32;l++)
+	m[l]=s_box[m[l]];
 	}
 
 	printf("Ciphered message:\n");
@@ -611,8 +611,8 @@ int main()
 	}
 
 	printf("\n");
-	memcpy(w,ss,32);
-	memcpy(r,out,32);
+	//memcpy(w,ss,32);
+	//memcpy(r,out,32);
 	for(i=0;i<32;i++)
 	printf("%d ",r[i]);
 	printf("\n");
@@ -621,16 +621,16 @@ int main()
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
 	printf("%d ",w[l]);
-	w[l]^=w[r[l]];
+	//w[l]^=w[r[l]];
 	}
 	printf("\n");
-	for(i=0;i<32;i++)
-	m[i]=inv_s_box[m[i]];
+	for(int l=0;l<32;l++)
+	m[l]=inv_s_box[m[l]];
 	sub(m,w);
 	//dec(m,w);
 	//perm(m,inv_r);
-	rounder();
-	//reverse();
+	//rounder();
+	reverse();
 	}
 
 	printf("Original message (after inv cipher):\n");
@@ -643,3 +643,40 @@ int main()
 	free(w);
 
 }
+
+/*
+	for(int l=0;l<16;l++){
+	m[l]=s_box[m[l]];
+	//tmp[l]=m[l];
+	//m[l]=s_box[m[l]]^m[l+16];
+	//m[l+16]=tmp[l];
+	}
+	}
+
+	printf("Ciphered message:\n");
+	for (i = 0; i < 32; i++) {
+		printf("%02x ", m[i]);
+	}
+
+	printf("\n");
+	memcpy(w,ss,32);
+	memcpy(r,out,32);
+	//for(i=0;i<32;i++)
+	//printf("%d ",r[i]);
+	//printf("\n");
+
+	//aes_inv_cipher(out, m, w);
+	for(i=0;i<16;i++){
+	for(int l=0;l<32;l++){
+	printf("%d ",w[l]);
+	w[l]^=w[r[l]];
+	}
+	printf(" bbb\n");
+	
+	for(int l=0;l<16;l++){
+	m[l]=inv_s_box[m[l]];
+	//tmp[l]=m[l+16];
+	//m[l+16]=s_box[m[l+16]]^m[l];
+	//m[l]=tmp[l];
+	}
+*/	
