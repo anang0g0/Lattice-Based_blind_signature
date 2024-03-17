@@ -325,6 +325,32 @@ void sche(uint8_t *o){
 	o[i]^=o[r[i]];
 }
 
+void euc(uint8_t *m,uint8_t *k){
+int i,j;
+uint8_t s[16],tmp[16],u[32];
+
+for(i=0;i<16;i++){
+tmp[i]=m[i];
+s[i]=s_box[m[i]^k[i]]^m[i+16];
+m[i+16]=tmp[i];
+m[i]=s[i];
+}
+}
+
+void uec(uint8_t *m,uint8_t *k){
+int i,j;
+uint8_t s[16],tmp[16],u[32]={0};
+
+for(i=0;i<16;i++){
+tmp[i]=m[i];
+m[i]^=s_box[m[i+16]];
+u[i+16]=m[i];
+m[i]=inv_s_box[tmp[i]^u[i+16]];
+m[i+16]=u[i+16];
+}
+}
+
+
 void enc(uint8_t *m, __uint8_t *k)
 {
     int i;
@@ -568,7 +594,8 @@ int main()
 	
 	w = aes_init(32);
 
-	aes_key_expansion(k, w);
+	//aes_key_expansion(k, w);
+	memcpy(w,k,32);
 
 
     random_shuffle(p,32);
@@ -586,21 +613,29 @@ int main()
 	for (i = 0; i < 32; i++) {
 		printf("%02x ", m[i]);
 	}
-
 	printf("\n");
-	for(i=0;i<32;i++)
-	kkk[i]=255;
+	uint8_t table[16][32];
+	for(i=0;i<16;i++){
+	for(int j=0;j<32;j++)
+	w[j]^=w[r[j]];
+	rounder();
+	for(int j=0;j<32;j++)
+	table[i][j]=w[j];
+	}
+	memcpy(r,out,32);
 	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
 	printf("%d ",w[l]);
 	//w[l]^=w[r[l]];
+	w[l]=table[i][l];
 	}
 	printf("\n");
 	rounder();
 	//perm(m,r);
 	//enc(m,w);
 	add(m,w);
+	//euc(m,w);
 	for(int l=0;l<32;l++)
 	m[l]=s_box[m[l]];
 	}
@@ -609,10 +644,13 @@ int main()
 	for (i = 0; i < 32; i++) {
 		printf("%02x ", m[i]);
 	}
-
 	printf("\n");
+	//exit(1);
+	
 	//memcpy(w,ss,32);
-	//memcpy(r,out,32);
+	memcpy(r,out,32);
+	for(i=0;i<16;i++)
+	rounder();
 	for(i=0;i<32;i++)
 	printf("%d ",r[i]);
 	printf("\n");
@@ -621,12 +659,15 @@ int main()
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
 	printf("%d ",w[l]);
-	//w[l]^=w[r[l]];
+	w[l]=table[15-i][l];
 	}
 	printf("\n");
 	for(int l=0;l<32;l++)
 	m[l]=inv_s_box[m[l]];
+	//uec(m,w);
 	sub(m,w);
+	//for(int j=0;j<32;j++)
+	//w[j]=table[15-i][j];
 	//dec(m,w);
 	//perm(m,inv_r);
 	//rounder();
