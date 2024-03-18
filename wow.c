@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <immintrin.h>
+#include <time.h>
+
 
 unsigned char p[32], q[32],r[32],inv_r[32],inv_p[32],gf[256],fg[256],kkk[32]={0};
 
@@ -591,17 +593,21 @@ int main()
     unsigned char k[32]={0},ss[32];
 	unsigned tt[256],inv_tt[256];
     //unsigned char p[32],inv_p[32];
-	unsigned char s[32],inv_s[32],nonce[32];
+	unsigned char s[32],inv_s[32],nonce[32]={103,198,105,115,81,255,74,236,41,205,186,171,242,251,227,70,124,194,84,248,27,232,231,141,118,90,46,99,51,159,201,154};
+
+
     for (i = 0; i < 32; i++)
     {
-        m[i] = 255-i;
-		nonce[i]=random()%256;
-        k[i] ^= nonce[i]^0; //rand() % 256;
+        m[i] = 0;//255-i;
+		printf("%d,",nonce[i]);
+		k[i]=0; //random() % 256;
+        k[i] ^= nonce[i]; 
         p[i]=i;
         r[i]=i;
 		ss[i]=k[i];
 		
     }
+	printf("\n");
 	uint8_t *w; // expanded key
     uint8_t out[32],mo[256],inv_mo[256];
 
