@@ -355,13 +355,13 @@ void shift_rows(uint8_t *state) {
 		// shift(r, 4) = r;
 		s = 0;
 		while (s < i) {
-			tmp = state[Nb*i+0];
+			tmp = state[8*i+0];
 			
-			for (k = 1; k < Nb; k++) {
-				state[Nb*i+k-1] = state[Nb*i+k];
+			for (k = 1; k < 8; k++) {
+				state[8*i+k-1] = state[8*i+k];
 			}
 
-			state[Nb*i+Nb-1] = tmp;
+			state[8*i+8-1] = tmp;
 			s++;
 		}
 	}
@@ -373,21 +373,18 @@ void shift_rows(uint8_t *state) {
  */
 void inv_shift_rows(uint8_t *state) {
 
-	uint8_t i, k, s, tmp,tmp2;
+	uint8_t i, k, s, tmp;
 
 	for (i = 1; i < 4; i++) {
 		s = 0;
 		while (s < i) {
-			tmp = state[8*i+7];
-			tmp2=state[8*i+6];
+			tmp = state[8*i+8-1];
 			
-			for (k = 5; k > 1; k-=2) {
-				state[8*i+k] = state[8*i+k-2];
-				state[8*i+k-1] = state[8*i+k-3];
+			for (k = 8-1; k > 0; k--) {
+				state[8*i+k] = state[8*i+k-1];
 			}
 
-			state[Nb*i+1] = tmp;
-			state[Nb*i+0] = tmp2;
+			state[8*i+0] = tmp;
 			s++;
 		}
 	}
@@ -963,6 +960,7 @@ int main()
 	add(m,k);
 	//for(i=0;i<32;i++)
 	//m[i]=i;
+	shift_rows(m);
 	l2m(m,mm);
 	//exit(1);
 	matmax(der,mm,con);
@@ -997,6 +995,7 @@ int main()
 	matmax(snoot,mm,con);
 	m2l(con,m);
 	//exit(1);
+	inv_shift_rows(m);
 	sub(m,k);
 	reverse();
 	}
