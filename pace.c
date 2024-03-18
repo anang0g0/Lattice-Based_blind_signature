@@ -871,6 +871,7 @@ label:
     mat_print(t);
     printf("TA=\n");
     mull(h, a2, f);
+    printf("Dr.moroo\n");
     mat_print(f);
     // exit(1);
     short y[N][N] = {0};
@@ -883,6 +884,7 @@ label:
                 tmp[i][j] = a3[i][j];
         }
     }
+    printf("tmp\n");
     mat_print(tmp);
     // exit(1);
     inverseMatrix2(tmp, y);
