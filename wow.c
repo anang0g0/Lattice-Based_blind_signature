@@ -588,7 +588,7 @@ int main()
 {
     unsigned short i;
     unsigned char m[128];
-    unsigned char k[32],ss[32];
+    unsigned char k[32]={0},ss[32];
 	unsigned tt[256],inv_tt[256];
     //unsigned char p[32],inv_p[32];
 	unsigned char s[32],inv_s[32],nonce[32];
@@ -700,7 +700,6 @@ int main()
 	for (i = 0; i < 32; i++) {
 		printf("%02x ", inv_s_box[s_box[m[i]]]);
 	}
-
 	printf("\n");
 
 	free(w);
