@@ -10,9 +10,9 @@
 #include <math.h>
 #include <x86intrin.h> // SIMD命令を使用するためのヘッダファイル
 
-#define M 16
-#define K 8
-#define N 16
+#define M 32
+#define K 16
+#define N 32
 #define E 4
 
 // #include "aaa.c"
