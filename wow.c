@@ -7,7 +7,7 @@
 #include <time.h>
 
 
-unsigned char p[32], q[32],r[32],inv_r[32],inv_p[32],gf[256],fg[256],kkk[32]={0};
+unsigned char p[32], q[32],r[32],inv_r[32],inv_p[32],kkk[32]={0};
 
 //x^7+c
 static const uint8_t s_box[256]={198,199,70,57,92,213,163,101,243,107,133,248,150,155,108,181,3,216,45,145,16,53,244,135,83,192,137,230,128,240,99,222,167,22,95,59,77,30,254,73,228,161,249,242,174,20,11,206,50,55,235,34,74,219,109,1,166,134,152,239,65,232,114,189,160,97,201,149,104,229,184,153,171,113,165,121,217,82,157,33,118,39,141,88,116,31,131,93,76,215,210,86,203,119,170,56,84,245,226,117,183,48,140,12,6,209,196,190,0,236,188,204,32,127,139,251,18,29,129,144,241,9,44,96,25,172,15,63,13,225,90,194,7,125,200,247,182,193,246,110,185,69,146,176,250,75,130,94,187,234,238,227,223,36,178,191,164,162,23,214,47,173,58,103,124,2,197,85,52,64,37,21,61,168,115,147,43,154,158,233,40,19,132,72,28,138,175,100,122,123,35,78,159,156,46,186,91,10,180,67,120,98,79,89,252,169,102,14,17,5,179,41,221,237,148,27,60,224,26,211,143,106,177,112,151,42,195,66,81,212,111,231,255,54,62,80,38,202,126,4,24,220,208,49,205,71,218,68,8,105,87,136,253,207,142,51};
@@ -297,6 +297,102 @@ int mlt(int x, int y)
 }
 
 
+/*
+ * Transformation in the Cipher that takes all of the columns of the 
+ * State and mixes their data (independently of one another) to 
+ * produce new columns.
+ */
+void mix_columns(uint8_t *state) {
+
+	uint8_t a[] = {0x02, 0x01, 0x01, 0x03}; // a(x) = {02} + {01}x + {01}x2 + {03}x3
+	uint8_t i, j, col[4], res[4];
+
+	for (j = 0; j < Nb; j++) {
+		for (i = 0; i < 4; i++) {
+			col[i] = state[Nb*i+j];
+		}
+
+		coef_mult(a, col, res);
+
+		for (i = 0; i < 4; i++) {
+			state[Nb*i+j] = res[i];
+		}
+	}
+}
+
+/*
+ * Transformation in the Inverse Cipher that is the inverse of 
+ * MixColumns().
+ */
+void inv_mix_columns(uint8_t *state) {
+
+	uint8_t a[] = {0x0e, 0x09, 0x0d, 0x0b}; // a(x) = {0e} + {09}x + {0d}x2 + {0b}x3
+	uint8_t i, j, col[4], res[4];
+
+	for (j = 0; j < Nb; j++) {
+		for (i = 0; i < 4; i++) {
+			col[i] = state[Nb*i+j];
+		}
+
+		coef_mult(a, col, res);
+
+		for (i = 0; i < 4; i++) {
+			state[Nb*i+j] = res[i];
+		}
+	}
+}
+
+/*
+ * Transformation in the Cipher that processes the State by cyclically 
+ * shifting the last three rows of the State by different offsets. 
+ */
+void shift_rows(uint8_t *state) {
+
+	uint8_t i, k, s, tmp;
+
+	for (i = 1; i < 4; i++) {
+		// shift(1,4)=1; shift(2,4)=2; shift(3,4)=3
+		// shift(r, 4) = r;
+		s = 0;
+		while (s < i) {
+			tmp = state[Nb*i+0];
+			
+			for (k = 1; k < Nb; k++) {
+				state[Nb*i+k-1] = state[Nb*i+k];
+			}
+
+			state[Nb*i+Nb-1] = tmp;
+			s++;
+		}
+	}
+}
+
+/*
+ * Transformation in the Inverse Cipher that is the inverse of 
+ * ShiftRows().
+ */
+void inv_shift_rows(uint8_t *state) {
+
+	uint8_t i, k, s, tmp,tmp2;
+
+	for (i = 1; i < 4; i++) {
+		s = 0;
+		while (s < i) {
+			tmp = state[8*i+7];
+			tmp2=state[8*i+6];
+			
+			for (k = 5; k > 1; k-=2) {
+				state[8*i+k] = state[8*i+k-2];
+				state[8*i+k-1] = state[8*i+k-3];
+			}
+
+			state[Nb*i+1] = tmp;
+			state[Nb*i+0] = tmp2;
+			s++;
+		}
+	}
+}
+
 void add(uint8_t *m,uint8_t *k){
     int i,n;
     for (i = 0; i < 32; i++){
@@ -353,6 +449,7 @@ m[i]=inv_s_box[tmp[i]^u[i+16]];
 m[i+16]=u[i+16];
 }
 }
+
 
 
 void enc(uint8_t *m, __uint8_t *k)
@@ -586,9 +683,181 @@ y^=__builtin_parity((gmult(x,x)&A[i])^c);
 return y;
 }
 
+
+unsigned short vb[4][4] = {0};
+
+unsigned short gf[256]={0,1,2,4,8,16,32,64,128,29,58,116,232,205,135,19,38,76,152,45,90,180,117,234,201,143,3,6,12,24,48,96,192,157,39,78,156,37,74,148,53,106,212,181,119,238,193,159,35,70,140,5,10,20,40,80,160,93,186,105,210,185,111,222,161,95,190,97,194,153,47,94,188,101,202,137,15,30,60,120,240,253,231,211,187,107,214,177,127,254,225,223,163,91,182,113,226,217,175,67,134,17,34,68,136,13,26,52,104,208,189,103,206,129,31,62,124,248,237,199,147,59,118,236,197,151,51,102,204,133,23,46,92,184,109,218,169,79,158,33,66,132,21,42,84,168,77,154,41,82,164,85,170,73,146,57,114,228,213,183,115,230,209,191,99,198,145,63,126,252,229,215,179,123,246,241,255,227,219,171,75,150,49,98,196,149,55,110,220,165,87,174,65,130,25,50,100,200,141,7,14,28,56,112,224,221,167,83,166,81,162,89,178,121,242,249,239,195,155,43,86,172,69,138,9,18,36,72,144,61,122,244,245,247,243,251,235,203,139,11,22,44,88,176,125,250,233,207,131,27,54,108,216,173,71,142};
+unsigned short fg[256]={0,1,2,26,3,51,27,199,4,224,52,239,28,105,200,76,5,101,225,15,53,142,240,130,29,194,106,249,201,9,77,114,6,139,102,48,226,37,16,34,54,148,143,219,241,19,131,70,30,182,195,126,107,40,250,186,202,155,10,121,78,229,115,167,7,192,140,99,103,222,49,254,227,153,38,180,17,146,35,137,55,209,149,207,144,151,220,190,242,211,20,93,132,57,71,65,31,67,183,164,196,73,127,111,108,59,41,85,251,134,187,62,203,95,156,160,11,22,122,44,79,213,230,173,116,244,168,88,8,113,193,248,141,129,100,14,104,75,223,238,50,198,255,25,228,166,154,120,39,185,181,125,18,69,147,218,36,33,138,47,56,64,210,92,150,189,208,206,145,136,152,179,221,253,191,98,243,87,212,172,21,43,94,159,133,61,58,84,72,110,66,163,32,46,68,217,184,124,165,119,197,24,74,237,128,13,112,247,109,162,60,83,42,158,86,171,252,97,135,178,188,205,63,91,204,90,96,177,157,170,161,82,12,246,23,236,123,118,45,216,80,175,214,234,231,232,174,233,117,215,245,235,169,81,89,176};
+
+
+int mltn(int n, int x) {
+    int ret = 1;
+    while (n > 0) {
+        if (n & 1) ret = mlt(ret , x) ;  // n の最下位bitが 1 ならば x^(2^i) をかける
+        x = mlt(x , x);
+        n >>= 1;  // n を1bit 左にずらす
+    }
+    return ret;
+}
+
+
+void van(int kk)
+{
+    int i, j, k;
+
+    printf("van der\n");
+
+    for (i = 0; i < 5; i++)
+        vb[0][i] = 1;
+    //#pragma omp parallel for private(i, j)
+    for (i = 1; i < 6; i++)
+    {
+        for (j = 0; j < 6; j++)
+        {
+            vb[i][j] = gf[mltn(i, fg[j])];
+            printf("%d,", vb[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+uint8_t der[4][4]={
+//{11,11,11,11},
+//{12,12,12,12},
+//{13,13,13,13},
+//{14,14,14,14}
+{2,3,4,5},
+{4,5,16,17},
+{8,15,64,85},
+{16,17,29,28}
+};
+//{1,2,3,4},
+//{1,4,5,16},
+//{1,8,15,64},
+//{1,16,17,29}
+
+uint8_t snoot[4][4]={
+{104,115,192,96},
+{210,233,192,64},
+{26,80,192,48},
+{58,139,192,203}
+
+//{166,150,122,75},
+//{244,110,122,224},
+//{78,244,122,192},
+//{32,219,0,251}
+};
+
+void matmax(uint8_t g[4][4], uint8_t h[4][8], uint8_t c[4][8])
+{
+    int i, j, k;
+    // GH=0であることの確認。
+    for (i = 0; i < 4; i++)
+    {
+        for (j = 0; j < 8; j++)
+        {
+		c[i][j]=0;
+            for (k = 0; k < 4; k++)
+                c[i][j] ^= gf[mlt(fg[g[i][k]], fg[h[k][j]])];
+            //printf("c%d,", c[i][j]);
+        }
+        //printf("\n");
+    }
+    //printf("\n");
+}
+
+int oinv(unsigned short b)
+{
+    int i;
+
+    if (b == 0)
+        return 0;
+
+    return (256 - fg[b]) % (256 - 1) + 1;
+}
+
+
+#define MATRIX_SIZE 4
+// 行列の逆行列を計算する関数
+void inverseMatrix(uint8_t A[MATRIX_SIZE][MATRIX_SIZE], uint8_t A_inv[MATRIX_SIZE][MATRIX_SIZE])
+{
+    int i, j, k;
+    uint8_t temp;
+
+    // 単位行列を初期化
+    for (i = 0; i < MATRIX_SIZE; i++)
+    {
+        for (j = 0; j < MATRIX_SIZE; j++)
+        {
+            A_inv[i][j] = (i == j) ? 1 : 0;
+        }
+    }
+
+    // ガウス・ジョルダン法による逆行列の計算
+    for (k = 0; k < MATRIX_SIZE; k++)
+    {
+        temp = gf[oinv(A[k][k])];
+        for (j = 0; j < MATRIX_SIZE; j++)
+        {
+            A[k][j] = gf[mlt(fg[A[k][j]], fg[temp])];
+            A_inv[k][j] = gf[mlt(fg[A_inv[k][j]], fg[(temp)])];
+        }
+        for (i = 0; i < MATRIX_SIZE; i++)
+        {
+            if (i != k)
+            {
+                temp = A[i][k];
+                for (j = 0; j < MATRIX_SIZE; j++)
+                {
+                    A[i][j] ^= gf[mlt(fg[A[k][j]], fg[temp])];
+                    A_inv[i][j] ^= gf[mlt(fg[A_inv[k][j]], fg[temp])];
+                }
+            }
+        }
+    }
+
+for(i=0;i<4;i++){
+	for(j=0;j<4;j++)
+		printf("%d,",A_inv[i][j]);
+		printf("\n");
+}
+printf("\n");
+
+}
+
+void l2m(uint8_t m[32],uint8_t mm[4][8]){
+int i,j;
+
+for(i=0;i<4;i++){
+	for(j=0;j<8;j++)
+		mm[i][j]=m[i*8+j];
+	}
+}
+
+void m2l(uint8_t mm[4][8],uint8_t m[32]){
+int i,j;
+
+for(i=0;i<4;i++){
+	for(j=0;j<8;j++)
+		m[i*8+j]=mm[i][j];
+}
+}
+
+void shigt(uint8_t m[4][8]){
+int i,j;
+
+for(i=1;i<4;i++){
+uint8_t tmp=m[i][i*2-2];
+uint8_t tmp2=m[i][i*2-1];
+for(j=0;j<8;j++)
+m[i][j]=m[i][j+2];
+}
+
+}
+
 int main()
 {
-    unsigned short i;
+    unsigned short i,j;
     unsigned char m[128];
     unsigned char k[32]={0},ss[32];
 	unsigned tt[256],inv_tt[256];
@@ -607,10 +876,27 @@ int main()
 		ss[i]=k[i];
 		
     }
-	printf("\n");
+	//printf("\n");
 	uint8_t *w; // expanded key
     uint8_t out[32],mo[256],inv_mo[256];
+	uint8_t mm[4][8]={0},con[4][8]={0};
 
+	van(4);
+	//inverseMatrix(der,snoot);
+	for(i=0;i<4;i++){
+	for(j=0;j<4;j++){
+	mm[i][j]=snoot[i][j];
+	mm[i][j+4]=snoot[i][j];
+	}
+	}
+	matmax(der,mm,con);
+	//exit(1);
+	for(i=0;i<4;i++){
+	for(int j=0;j<8;j++)
+	printf("%d,",con[i][j]);
+	printf("\n");
+	}
+	//exit(1);
 	for(i=0;i<256;i++){
 	mo[i]=mkbox(i);//box(i);
 	printf("%d,",mo[i]);
@@ -664,15 +950,24 @@ int main()
 	}
 	memcpy(r,out,32);
 	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
+
+
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
-	printf("%d ",k[l]);
+	//printf("%d ",k[l]);
 	//w[l]^=w[r[l]];
 	k[l]=table[i][l];
 	}
-	printf("\n");
+	//printf("\n");
 	rounder();
 	add(m,k);
+	//for(i=0;i<32;i++)
+	//m[i]=i;
+	l2m(m,mm);
+	//exit(1);
+	matmax(der,mm,con);
+	//exit(1);
+	m2l(con,m);
 	perm(m,r);
 	for(int l=0;l<32;l++)
 	m[l]=s_box[m[l]];
@@ -691,13 +986,17 @@ int main()
 	//aes_inv_cipher(out, m, w);
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
-	printf("%d ",k[l]);
+	//printf("%d ",k[l]);
 	k[l]=table[15-i][l];
 	}
-	printf("\n");
+	//printf("\n");
 	for(int l=0;l<32;l++)
 	m[l]=inv_s_box[m[l]];
 	perm(m,inv_r);
+	l2m(m,mm);
+	matmax(snoot,mm,con);
+	m2l(con,m);
+	//exit(1);
 	sub(m,k);
 	reverse();
 	}
