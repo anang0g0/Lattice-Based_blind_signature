@@ -591,11 +591,12 @@ int main()
     unsigned char k[32],ss[32];
 	unsigned tt[256],inv_tt[256];
     //unsigned char p[32],inv_p[32];
-	unsigned char s[32],inv_s[32];
+	unsigned char s[32],inv_s[32],nonce[32];
     for (i = 0; i < 32; i++)
     {
-        m[i] = i+1;
-        k[i] = rand() % 256;
+        m[i] = 255-i;
+		nonce[i]=random()%256;
+        k[i] ^= nonce[i]^0; //rand() % 256;
         p[i]=i;
         r[i]=i;
 		ss[i]=k[i];
@@ -630,7 +631,7 @@ int main()
 	w = aes_init(32);
 
 	//aes_key_expansion(k, w);
-	memcpy(w,k,32);
+	//memcpy(w,k,32);
 
 
     random_shuffle(p,32);
@@ -650,22 +651,22 @@ int main()
 	uint8_t table[16][32];
 	for(i=0;i<16;i++){
 	for(int j=0;j<32;j++)
-	w[j]^=w[r[j]];
+	k[j]^=k[r[j]];
 	rounder();
 	for(int j=0;j<32;j++)
-	table[i][j]=w[j];
+	table[i][j]=k[j];
 	}
 	memcpy(r,out,32);
 	//aes_cipher(m /* in */, out /* out */, w /* expanded key */);
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
-	printf("%d ",w[l]);
+	printf("%d ",k[l]);
 	//w[l]^=w[r[l]];
-	w[l]=table[i][l];
+	k[l]=table[i][l];
 	}
 	printf("\n");
 	rounder();
-	add(m,w);
+	add(m,k);
 	perm(m,r);
 	for(int l=0;l<32;l++)
 	m[l]=s_box[m[l]];
@@ -684,14 +685,14 @@ int main()
 	//aes_inv_cipher(out, m, w);
 	for(i=0;i<16;i++){
 	for(int l=0;l<32;l++){
-	printf("%d ",w[l]);
-	w[l]=table[15-i][l];
+	printf("%d ",k[l]);
+	k[l]=table[15-i][l];
 	}
 	printf("\n");
 	for(int l=0;l<32;l++)
 	m[l]=inv_s_box[m[l]];
 	perm(m,inv_r);
-	sub(m,w);
+	sub(m,k);
 	reverse();
 	}
 
