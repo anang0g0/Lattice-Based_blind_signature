@@ -160,6 +160,14 @@ void coef_mult(uint8_t *a, uint8_t *b, uint8_t *d) {
 	d[3] = gmult(a[3],b[0])^gmult(a[2],b[1])^gmult(a[1],b[2])^gmult(a[0],b[3]);
 }
 
+uint8_t rotl(uint8_t x,uint8_t r){
+if(r==0)
+return x;
+if(r<0)
+return (x >> r) | (x << (8 - r));
+
+return (x << r) | (x >> (8 - r));
+}
 
 /*
  * Function used in the Key Expansion routine that takes a four-byte 
@@ -1004,7 +1012,7 @@ int main()
 	uint8_t table[16][32];
 	for(i=0;i<16;i++){
 	for(int j=0;j<32;j++)
-	k[j]^=k[r[j]];
+	k[j]^=rotl(k[r[j]],3);
 	rounder();
 	for(int j=0;j<32;j++)
 	table[i][j]=k[j];
@@ -1022,8 +1030,10 @@ int main()
 	//printf("\n");
 	rounder();
 	add(m,k);
-	for(int l=0;l<32;l++)
+	for(int l=0;l<32;l++){
+	if(l%2==0)
 	m[l]=s_box[m[l]];
+	}
 	shift_rows(m);
 	l2m(m,mm);
 	matmax(der,mm,con);
@@ -1053,8 +1063,10 @@ int main()
 	matmax(snoot,mm,con);
 	m2l(con,m);
 	inv_shift_rows(m);
-	for(int l=0;l<32;l++)
+	for(int l=0;l<32;l++){
+		if(l%2==0)
 	m[l]=inv_s_box[m[l]];
+	}
 	sub(m,k);
 	reverse();
 	}
