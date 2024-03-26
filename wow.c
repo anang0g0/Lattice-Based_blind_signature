@@ -297,7 +297,9 @@ void uec(uint8_t *m, uint8_t *k)
 
 unsigned char mkbox(unsigned char x)
 {
+	//GF(256)
 	//return gmult(gmult(gmult(x, x), gmult(x, x)), gmult(gmult(x, x), x)) ^ 198;
+	//GF(257)
 	return x*x*x%257;
 }
 
