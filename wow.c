@@ -611,6 +611,7 @@ uint8_t *aes_init(size_t key_size) {
 
 unsigned char mkbox(unsigned char x){
 	return gmult(gmult(gmult(x,x),gmult(x,x)),gmult(gmult(x,x),x))^198;
+	//return x*x*x%257;
 }
 
 int invb(int i){
