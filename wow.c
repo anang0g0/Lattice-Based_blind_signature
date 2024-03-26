@@ -36,20 +36,32 @@ uint16_t inv(uint16_t a, uint16_t n)
 {
 	uint16_t d = n;
 	uint16_t x = 0;
-	uint16_t s = 1, q, r, t;
+	uint16_t s = 1, q=0, r=0, t=0;
 	while (a != 0)
 	{
 		q = d / a;
 		r = d % a;
 		d = a;
 		a = r;
-		t = x - q * s;
+		t = (n + x - q * s);
 		x = s;
 		s = t;
 	}
 	// gcd = d  # $\gcd(a, n)$
 
-	return ((x + n) % (n / d));
+	return ((x + n) % (n / d))%n;
+}
+
+uint16_t voi(uint16_t a,uint16_t n){
+	int i;
+
+if(a==0)
+return 0;
+	for(i=0;i<n;i++)
+	if(a*i%n==1)
+	return i;
+printf("baka\n");
+exit(1);
 }
 
 /*
@@ -103,34 +115,6 @@ void ha(__uint128_t a, __uint128_t b)
 	}
 }
 
-/*
- * Generates the round constant Rcon[i]
- */
-uint8_t R[] = {0x02, 0x00, 0x00, 0x00};
-
-uint8_t *Rcon(uint8_t i)
-{
-
-	if (i == 1)
-	{
-		R[0] = 0x01; // x^(1-1) = x^0 = 1
-	}
-	else if (i > 1)
-	{
-		R[0] = 0x02;
-		i--;
-		while (i > 1)
-		{
-			R[0] = gmult(R[0], 0x02);
-			i--;
-		}
-	}
-
-	return R;
-}
-
-#define Nb 8
-
 uint8_t rotl(uint8_t x, uint8_t r)
 {
 	if (r == 0)
@@ -140,28 +124,6 @@ uint8_t rotl(uint8_t x, uint8_t r)
 
 	return (x << r) | (x >> (8 - r));
 }
-
-/*
- * Function used in the Key Expansion routine that takes a four-byte
- * word and performs a cyclic permutation.
- */
-void rot_word(uint8_t *w)
-{
-
-	uint8_t tmp;
-	uint8_t i;
-
-	tmp = w[0];
-
-	for (i = 0; i < 3; i++)
-	{
-		w[i] = w[i + 1];
-	}
-
-	w[3] = tmp;
-}
-
-
 
 void rounder()
 {
@@ -211,7 +173,6 @@ int mlt(int x, int y)
 
 	return ((x + y - 2) % (256 - 1)) + 1;
 }
-
 
 /*
  * Transformation in the Cipher that processes the State by cyclically
@@ -334,16 +295,15 @@ void uec(uint8_t *m, uint8_t *k)
 	}
 }
 
-
-
 unsigned char mkbox(unsigned char x)
 {
-	return gmult(gmult(gmult(x, x), gmult(x, x)), gmult(gmult(x, x), x)) ^ 198;
+	//return gmult(gmult(gmult(x, x), gmult(x, x)), gmult(gmult(x, x), x)) ^ 198;
+	return x*x*x%257;
 }
 
-int invb(int i)
+uint16_t invb(uint16_t i)
 {
-	return inv(i, 257);
+	return inv(i*i*i%257, 257);
 }
 
 uint64_t pd(uint64_t a, uint64_t b, uint64_t d)
@@ -396,7 +356,7 @@ void gen_t_box(unsigned *gf, unsigned *fg)
 uint8_t box(unsigned char x)
 {
 	int i;
-//	uint8_t a;
+	//	uint8_t a;
 	uint8_t A[8] = {
 		0b10001111,
 		0b11000111,
@@ -521,7 +481,6 @@ void matmax2(uint8_t g[8][8], uint8_t h[8][8], uint8_t c[8][8])
 int oinv(unsigned short b)
 {
 
-
 	if (b == 0)
 		return 0;
 
@@ -604,8 +563,8 @@ void shigt(uint8_t m[4][8])
 
 	for (i = 1; i < 4; i++)
 	{
-		//uint8_t tmp = m[i][i * 2 - 2];
-		//uint8_t tmp2 = m[i][i * 2 - 1];
+		// uint8_t tmp = m[i][i * 2 - 2];
+		// uint8_t tmp2 = m[i][i * 2 - 1];
 		for (j = 0; j < 8; j++)
 			m[i][j] = m[i][j + 2];
 	}
@@ -631,14 +590,13 @@ void milk(uint8_t vc[8][8])
 	// exit(1);
 }
 
-
 int main()
 {
 	unsigned short i;
 	unsigned char m[32];
 	unsigned char k[32] = {0};
-	//unsigned tt[256], inv_tt[256];
-	// unsigned char p[32],inv_p[32];
+	// unsigned tt[256], inv_tt[256];
+	//  unsigned char p[32],inv_p[32];
 	unsigned char s[32], nonce[32] = {103, 198, 105, 115, 81, 255, 74, 236, 41, 205, 186, 171, 242, 251, 227, 70, 124, 194, 84, 248, 27, 232, 231, 141, 118, 90, 46, 99, 51, 159, 201, 154};
 
 	for (i = 0; i < 32; i++)
@@ -649,13 +607,12 @@ int main()
 		k[i] ^= nonce[i];
 		p[i] = i;
 		r[i] = i;
-
 	}
 	// printf("\n");
-	//uint8_t *w; // expanded key
+	// uint8_t *w; // expanded key
 	uint8_t out[32]; //, mo[256], inv_mo[256];
 	uint8_t mm[4][8] = {0}, con[8][8] = {0};
-	//uint8_t l21[8][8] = {0}, s21[8][8] = {0};
+	// uint8_t l21[8][8] = {0}, s21[8][8] = {0};
 
 	random_shuffle(p, 32);
 	random_shuffle(r, 32);
@@ -674,6 +631,7 @@ int main()
 	}
 	printf("\n");
 	uint8_t table[16][32];
+	
 	for (i = 0; i < 16; i++)
 	{
 		for (int j = 0; j < 32; j++)
@@ -683,6 +641,12 @@ int main()
 			table[i][j] = k[j];
 	}
 	memcpy(r, out, 32);
+	uint8_t ss[256],inv_ss[256];
+	for(i=0;i<256;i++)
+	ss[i]=mkbox(i);
+	for(i=0;i<256;i++)
+	inv_ss[ss[i]]=i;
+	//exit(1);
 
 	for (i = 0; i < 16; i++)
 	{
@@ -698,7 +662,7 @@ int main()
 		for (int l = 0; l < 32; l++)
 		{
 			if (l % 2 == 0)
-				m[l] = s_box[m[l]];
+				m[l] = mkbox(m[l]); //s_box[m[l]];
 		}
 		shift_rows(m);
 		l2m(m, mm);
@@ -735,7 +699,7 @@ int main()
 		for (int l = 0; l < 32; l++)
 		{
 			if (l % 2 == 0)
-				m[l] = inv_s_box[m[l]];
+				m[l] = inv_ss[m[l]]; //inv_s_box[m[l]];
 		}
 		sub(m, k);
 		reverse();
@@ -747,5 +711,4 @@ int main()
 		printf("%02x ", inv_s_box[s_box[m[i]]]);
 	}
 	printf("\n");
-
 }
