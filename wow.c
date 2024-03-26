@@ -763,6 +763,24 @@ void matmax(uint8_t g[4][4], uint8_t h[4][8], uint8_t c[4][8])
     //printf("\n");
 }
 
+void matmax2(uint8_t g[8][8], uint8_t h[8][8], uint8_t c[8][8])
+{
+    int i, j, k;
+    // GH=0であることの確認。
+    for (i = 0; i < 8; i++)
+    {
+        for (j = 0; j < 8; j++)
+        {
+		c[i][j]=0;
+            for (k = 0; k < 8; k++)
+                c[i][j] ^= gf[mlt(fg[g[i][k]], fg[h[k][j]])];
+            printf("c%d,", g[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 int oinv(unsigned short b)
 {
     int i;
@@ -774,7 +792,7 @@ int oinv(unsigned short b)
 }
 
 
-#define MATRIX_SIZE 4
+#define MATRIX_SIZE 8
 // 行列の逆行列を計算する関数
 void inverseMatrix(uint8_t A[MATRIX_SIZE][MATRIX_SIZE], uint8_t A_inv[MATRIX_SIZE][MATRIX_SIZE])
 {
@@ -813,8 +831,8 @@ void inverseMatrix(uint8_t A[MATRIX_SIZE][MATRIX_SIZE], uint8_t A_inv[MATRIX_SIZ
         }
     }
 
-for(i=0;i<4;i++){
-	for(j=0;j<4;j++)
+for(i=0;i<MATRIX_SIZE;i++){
+	for(j=0;j<MATRIX_SIZE;j++)
 		printf("%d,",A_inv[i][j]);
 		printf("\n");
 }
@@ -852,6 +870,23 @@ m[i][j]=m[i][j+2];
 
 }
 
+void milk(uint8_t vc[8][8]){
+//uint16_t cx[8][8]={0};
+uint8_t i,j,k=0,l=0;
+
+for(i=3;i<18;i=i+2){
+for(j=2;j<17;j=j+2){
+vc[k][l++]=oinv((256+i-j)%256);
+printf("v%d,",vc[i][j]);
+}
+l=0;
+k++;
+printf("\n");
+}
+printf("\n");
+//exit(1);
+}
+
 int main()
 {
     unsigned short i,j;
@@ -876,10 +911,39 @@ int main()
 	//printf("\n");
 	uint8_t *w; // expanded key
     uint8_t out[32],mo[256],inv_mo[256];
-	uint8_t mm[4][8]={0},con[4][8]={0};
+	uint8_t mm[4][8]={0},con[8][8]={0};
+	uint8_t l21[8][8]={0},s21[8][8]={0};
 
 	van(4);
 	//inverseMatrix(der,snoot);
+	milk(l21);
+	for(i=0;i<8;i++){
+	for(j=0;j<8;j++)
+	printf("l%d,",l21[i][j]);
+	//l21[i][j]=rand()%256;
+	printf("\n");
+	}
+	printf("\n");
+
+	uint8_t staf[8][8]={0};
+	memcpy(staf,l21,64);
+	//exit(1);
+	inverseMatrix(l21,s21);
+	for(i=0;i<8;i++){
+	for(j=0;j<8;j++)
+	printf("%d,",s21[i][j]);
+	printf("\n");
+	}
+	printf("\n");
+	matmax2(staf,s21,con);
+	for(i=0;i<8;i++){
+	for(j=0;j<8;j++)
+	printf("xx%d,",con[i][j]);
+	printf("\n");
+	}
+	printf("\n");
+	//exit(1);
+
 	for(i=0;i<4;i++){
 	for(j=0;j<4;j++){
 	mm[i][j]=snoot[i][j];
@@ -958,17 +1022,13 @@ int main()
 	//printf("\n");
 	rounder();
 	add(m,k);
-	//for(i=0;i<32;i++)
-	//m[i]=i;
-	shift_rows(m);
-	l2m(m,mm);
-	//exit(1);
-	matmax(der,mm,con);
-	//exit(1);
-	m2l(con,m);
-	perm(m,r);
 	for(int l=0;l<32;l++)
 	m[l]=s_box[m[l]];
+	shift_rows(m);
+	l2m(m,mm);
+	matmax(der,mm,con);
+	m2l(con,m);
+	perm(m,r);
 	}
 
 	printf("Ciphered message:\n");
@@ -988,14 +1048,13 @@ int main()
 	k[l]=table[15-i][l];
 	}
 	//printf("\n");
-	for(int l=0;l<32;l++)
-	m[l]=inv_s_box[m[l]];
 	perm(m,inv_r);
 	l2m(m,mm);
 	matmax(snoot,mm,con);
 	m2l(con,m);
-	//exit(1);
 	inv_shift_rows(m);
+	for(int l=0;l<32;l++)
+	m[l]=inv_s_box[m[l]];
 	sub(m,k);
 	reverse();
 	}

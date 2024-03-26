@@ -829,7 +829,7 @@ label:
 
     printf("mix=\n");
     mat_print(rr);
-    // exit(1);
+    //exit(1);
     printf("GH=\n");
 
     // GH=0であることの確認。
