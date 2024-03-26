@@ -2,6 +2,8 @@
 
 cf. PKP-Based Signature Scheme : Beullens, Faugere, Koussa, Macario-Rat, Patarin, Perret
 
+秘密鍵暗号、削除済み。
+
 # 20240326
 秘密鍵暗号をやっている。
 
