@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define N 5
+#define N 8
 
 #define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(short))
 #define SWAP(type, a, b) \
@@ -94,25 +94,27 @@ int main(){
     srand(clock());
     for(i=0;i<N;i++){
     p.x[i]=rand()%2;
-    p.pi[i]=i;
     q.x[i]=rand()%2;
-    q.pi[i]=i;
     }
     j=-1;
-    while(j<0){
+    do{
+    for(i=0;i<N;i++)
+    p.pi[i]=i;
     random_shuffle(p.pi,N);
     j=chk(p.pi);
-    printx(p);
-    }
+    //printx(p);
+    }while(j<0);
     j=-1;
-    while(j<0){
+    do{
+    for(i=0;i<N;i++)
+    q.pi[i]=i;
     random_shuffle(q.pi,N);
     j=chk(q.pi);
-    printx(q);
-    }
+    //printx(q);
+    }while(j<0);
 
     i=0;
-    while(i<2000000){
+    while(i<4000000){
     p=xxx(p,q);
     printx(p);
     //q=xxx(q,p);
