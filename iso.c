@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define N 8
+#define N 64
 
 #define SIZE_OF_ARRAY(array) (sizeof(array) / sizeof(short))
 #define SWAP(type, a, b) \
@@ -67,10 +67,12 @@ s.pi[i]=b.pi[a.pi[inv_b.pi[i]]];
 memcpy(a.pi,s.pi,N);
 t=a;
 
+//for(i=0;i<N;i++)
+//a.x[i]+=rotl(a.x[i],rand()%8);
 for(i=0;i<N;i++)
-a.x[i]+=rotl(b.x[i]^a.x[a.pi[i]],i%8);
+t.x[i]+=rotl(s.pi[i],-i%8)+rotl(b.x[i]^t.x[a.pi[i]],rand()%8);
 
-return a;
+return t;
 }
 
 FILE *fp;
@@ -90,7 +92,7 @@ int main(){
     comb t;
 
 
-    fp=fopen("test.bin","wb");
+    fp=fopen("111","wb");
     srand(clock());
     for(i=0;i<N;i++){
     p.x[i]=rand()%2;
@@ -114,7 +116,7 @@ int main(){
     }while(j<0);
 
     i=0;
-    while(i<500000){
+    while(i<400000){
     p=xxx(p,q);
     printx(p);
     //q=xxx(q,p);
