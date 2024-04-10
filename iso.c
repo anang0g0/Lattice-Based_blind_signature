@@ -57,7 +57,7 @@ unsigned char rotl(unsigned char x, unsigned char r)
 
 comb xxx(comb a, comb b){
 comb t;
-int i,j;
+unsigned i,j,l=0;
 comb inv_b={0},s={0};
 
 for(i=0;i<N;i++)
@@ -68,9 +68,9 @@ memcpy(a.pi,s.pi,N);
 t=a;
 
 for(i=0;i<N;i++)
-t.x[i]^=rotl(b.x[i]+a.x[a.pi[i]],i%8);
+a.x[i]+=rotl(b.x[i]^a.x[a.pi[i]],i%8);
 
-return t;
+return a;
 }
 
 FILE *fp;
@@ -114,7 +114,7 @@ int main(){
     }while(j<0);
 
     i=0;
-    while(i<4000000){
+    while(i<500000){
     p=xxx(p,q);
     printx(p);
     //q=xxx(q,p);
