@@ -92,7 +92,7 @@ t=a;
 //for(i=0;i<N;i++)
 //a.x[i]+=rotl(a.x[i],rand()%8);
 for(i=0;i<N;i++)
-t.x[i]+=s_box[rotl(a.x[i],-i%8)]+rotl(b.x[i]^t.x[a.pi[i]],rand()%8);
+t.x[i]+=s_box[rotl(a.x[i],-i%8)]+rotl(b.x[i]^t.x[a.pi[i]],i%8);
 
 return t;
 }
